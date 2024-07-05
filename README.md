@@ -5,7 +5,7 @@ Automatic system to fetch pesky restaurant reservations.
 ## Setup
 Requirements
 - [Bazel](https://bazel.build/install)
+- (Optional) [Make](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)
 
 Running
-1. `bazel build //src:main`
-2. `bazel-bin/src/main`
+1. `make`
