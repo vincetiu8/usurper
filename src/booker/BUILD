@@ -1,11 +1,11 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-cc_binary(
+cc_library(
     name = "booker",
     srcs = ["booker.cc"],
     hdrs = ["booker.h"],
     deps = [
-        "//resy:resy",
+        "//src/booker/proxies/resy:resy",
     ],
-    visibility = ["//main:__pkg__"],
+    visibility = ["//src:__pkg__"],
 )
