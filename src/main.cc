@@ -3,6 +3,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << booker() << concierge();
+    std::cout << booker() << concierge() << "\n";
     return 0;
 }
