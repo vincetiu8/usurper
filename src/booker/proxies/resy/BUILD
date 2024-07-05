@@ -4,5 +4,5 @@ cc_library(
     name = "resy",
     srcs = ["resy.cc"],
     hdrs = ["resy.h"],
-    visibility = ["//booker:__pkg__"],
+    visibility = ["//src/booker:__pkg__"],
 )

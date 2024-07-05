@@ -1,8 +1,8 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-cc_binary(
+cc_library(
     name = "concierge",
     srcs = ["concierge.cc"],
     hdrs = ["concierge.h"],
-    visibility = ["//main:__pkg__"],
+    visibility = ["//src:__pkg__"],
 )

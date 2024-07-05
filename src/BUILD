@@ -4,7 +4,7 @@ cc_binary(
     name = "main",
     srcs = ["main.cc"],
     deps = [
-        "//booker:booker",
-        "//concierge:concierge"
+        "//src/booker:booker",
+        "//src/concierge:concierge"
     ],
 )
