@@ -5,6 +5,8 @@ cc_binary(
     srcs = ["main.cc"],
     deps = [
         "//src/booker:booker",
-        "//src/concierge:concierge"
+        "//src/concierge:concierge",
+        "@boost//:beast",
+        "@catch2"
     ],
 )
