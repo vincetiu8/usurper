@@ -1,5 +1,3 @@
 #include "proxies/resy/resy.h"
 
-int booker() {
-    return resy();
-}
+int booker() { return resy(); }

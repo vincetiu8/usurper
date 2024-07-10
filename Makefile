@@ -5,3 +5,5 @@ run:
 	bazel-bin/src/main
 copy-compile-commands:
 	bazel run @hedron_compile_commands//:refresh_all --@boost//:beast_use_std_string_view
+debug:
+	bazel build //src:main --@boost//:beast_use_std_string_view -c dbg
