@@ -1,3 +1,1 @@
-int resy() {
-    return 0;
-}
+int resy() { return 0; }

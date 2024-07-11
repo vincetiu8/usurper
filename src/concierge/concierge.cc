@@ -1,3 +1,1 @@
-int concierge() {
-    return 0;
-}
+int concierge() { return 0; }
