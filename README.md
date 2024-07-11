@@ -1,11 +1,11 @@
 # Usurper
 
-Automatic system to fetch pesky restaurant reservations.
+automatic system to fetch pesky restaurant reservations.
 
 ## Setup
-Requirements
+requirements
 - [Bazel](https://bazel.build/install)
-- (Optional) [Make](https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu/)
+- [llvm](https://llvm.org/docs/GettingStarted.html)
 
-Running
+running
 1. `make`
