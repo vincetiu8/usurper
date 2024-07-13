@@ -4,8 +4,6 @@ cc_binary(
   name = "server",
   srcs = ["server.cc"],
   deps = [
-    "//src/booker",
-    "//src/concierge",
     "@boost//:beast",
     "@catch2"
   ],
