@@ -10,9 +10,9 @@ namespace asio = boost::asio;
 using tcp = asio::ip::tcp;
 
 /**
-  client for interacting with external http endpoints.
-  supports get and post requests.
-*/
+ * abstract client for interacting with external http endpoints.
+ * supports get and post requests.
+ */
 class HttpClient {
   const beast::string_view host_bs;
 
@@ -21,10 +21,11 @@ class HttpClient {
   beast::tcp_stream stream;
   const int http_version;
 
- public:
+ protected:
   HttpClient(std::string_view host, std::string_view port = "80");
 
   std::string get(std::string_view target);
 
-  std::string post(std::string_view target);
+  std::string post(std::string_view target, std::string content,
+                   beast::string_view content_type);
 };

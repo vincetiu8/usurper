@@ -47,15 +47,19 @@ std::string HttpClient::get(std::string_view target) {
   return s;
 }
 
-std::string HttpClient::post(std::string_view target) {
+std::string HttpClient::post(std::string_view target, std::string content,
+                             beast::string_view content_type) {
   if (target.length() == 0) {
     target = "/";
   }
 
   beast::string_view target_bs{target.data(), target.size()};
+
   http::request<http::string_body> req{http::verb::post, target_bs,
-                                       http_version, "hello"};
+                                       http_version, content};
+
   req.set(http::field::host, host_bs);
+  req.set(http::field::content_type, content_type);
   req.prepare_payload();
 
   http::write(stream, req);
