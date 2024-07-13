@@ -7,5 +7,5 @@ cc_library(
     deps = [
       "//src/utils/http_clients",
     ],
-    visibility = ["//src/booker:__pkg__", "//src/cli/proxies:__pkg__"],
+    visibility = ["//src/reserver:__pkg__", "//src/cli/proxies:__pkg__"],
 )

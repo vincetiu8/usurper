@@ -5,7 +5,7 @@ cc_library(
   srcs = ["proxy.cc", "http_clients.cc", "resy.cc"],
   hdrs = ["proxy.h", "http_clients.h", "resy.h"],
   deps = [
-    "//src/booker/proxies/resy",
+    "//src/reserver/proxies/resy",
     "//src/utils/cli",
     "//src/utils/http_clients",
   ],

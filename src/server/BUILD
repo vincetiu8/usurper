@@ -5,7 +5,7 @@ cc_binary(
   srcs = ["server.cc"],
   deps = [
     "@boost//:beast",
-    "@catch2"
+    "@catch2",
   ],
   visibility = ["//visibility:public"]
 )
