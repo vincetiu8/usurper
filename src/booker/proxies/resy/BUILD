@@ -5,7 +5,7 @@ cc_library(
     srcs = ["resy.cc"],
     hdrs = ["resy.h", "http_client.h"],
     deps = [
-      "//src/utils/proxy",
+      "//src/utils/http_clients",
     ],
     visibility = ["//src/booker:__pkg__", "//src/cli/proxies:__pkg__"],
 )
