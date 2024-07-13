@@ -20,7 +20,7 @@ class ResyApi {
    * endpoint to search for restaurants
    * api.resy.com/3/venuesearch/search
    */
-  std::vector<ResyApiVenueSchema> venue_search(std::string query, Location loc);
+  std::vector<ResyApiVenueSchema> venue_search(std::string query, Locality loc);
 
   /**
    * endpoint to find reservations

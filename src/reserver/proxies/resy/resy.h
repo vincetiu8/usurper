@@ -1,3 +1,7 @@
 #pragma once
 
-int resy();
+#include "src/reserver/reserver_models/reservation_proxy.h"
+
+// class ResyProxy : ReservationProxy {
+
+// };
