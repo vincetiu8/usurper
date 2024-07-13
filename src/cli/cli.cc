@@ -33,3 +33,12 @@ int main(int argc, char* argv[]) {
 
   return command_handler(args);
 }
+
+// constexpr Location defined_location_to_location(DefinedLocation dl) {
+//   switch (dl) {
+//     case DefinedLocation::new_york:
+//       return {40.76464, -73.973};
+//     case DefinedLocation::philadelphia:
+//       return {40.020446, -75.14894};
+//   }
+// }

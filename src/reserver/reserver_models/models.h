@@ -1,50 +1,88 @@
 #pragma once
 
-#include <chrono>
 #include <string>
 
 #include "src/utils/geo/geo.h"
-
-// namespace chrono = std::chrono;
+#include "src/utils/time/time.h"
 
 /**
  * represents a unique user in the system
  */
 class User {
-  // int id;  // primary key
+ public:
+  // primary key
+  int id;
+
   std::string name;
 };
 
 class ReservationService {
-  std::string code;  // primrary key
+ public:
+  // primary key
+  std::string code;
+
   std::string name;
 };
 
 class ReservationServiceUser {
+ public:
   ReservationService reservation_service;
+
   User user;
-  std::string token;  // JWT token
+
+  // JWT token
+  std::string token;
 };
 
 class Cuisine {
-  std::string name;  // primary key
+ public:
+  // primary key
+  std::string name;
 };
 
 class Restaurant {
-  // int id;  // primary key
+ public:
+  // primary key
+  // int id;
   std::string name;
+
   std::string locality_name;
+
   Locality locality;
+
   std::string cuisine_name;
+
   Cuisine cuisine;
+
   std::string reservation_service_code;
-  ReservationService reservation_service;  // currently we only support one
-                                           // reservation service per restaurant
+
+  // currently we only support one reservation service per restaurant
+  ReservationService reservation_service;
 };
 
 class Timeslot {
-  // int id;
-  // int restaurant_id;
+ public:
+  // primary key
+  int id;
+
+  int restaurant_id;
+
   Restaurant restaurant;
-  // chrono::year_month_day date;
+
+  Date date;
+
+  Time time;
+
+  int party_size;
+
+  bool available;
+};
+
+class Booking {
+ public:
+  int timeslot_id;
+  Timeslot timeslot;
+
+  int user_id;
+  User user;
 };
