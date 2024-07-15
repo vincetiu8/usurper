@@ -1,4 +1,4 @@
-#include <string>
+#include <string_view>
 
 const std::string_view RESY_HOST = "api.resy.com";
 
