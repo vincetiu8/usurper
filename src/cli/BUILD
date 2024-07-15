@@ -6,6 +6,7 @@ cc_binary(
   deps = [
     "//src/cli/proxies",
     "//src/utils/cli",
+    "//src/cli/db",
   ],
   visibility = ["//visibility:public"]
 )

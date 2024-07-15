@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <string_view>
-#include <vector>
 
+#include "src/cli/db/db.h"
 #include "src/cli/proxies/proxy.h"
 #include "src/utils/cli/cli_args.h"
 
@@ -17,6 +17,10 @@ int command_handler(cli_args& args) {
 
   if (command == "proxy") {
     return proxy_handler(args);
+  }
+
+  if (command == "db") {
+    return db_handler(args);
   }
 
   std::cout << "unknown command " << command << '\n';

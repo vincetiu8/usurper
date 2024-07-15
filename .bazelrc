@@ -1,4 +1,6 @@
-# common --enable_platform_specific_config
+common --enable_platform_specific_config
+common --enable_bzlmod
+
 build --cxxopt -std=c++20
 build --cxxopt -stdlib=libc++
 build --linkopt -stdlib=libc++

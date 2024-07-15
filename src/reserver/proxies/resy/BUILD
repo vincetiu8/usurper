@@ -7,6 +7,7 @@ cc_library(
     deps = [
       "//src/utils/http_clients",
       "//src/reserver/reserver_models",
+      "//src/utils/config",
     ],
     visibility = ["//src/reserver:__pkg__", "//src/cli/proxies:__pkg__"],
 )
