@@ -1,4 +1,3 @@
-#include <format>
 #include <pqxx/pqxx>
 #include <string>
 
@@ -16,3 +15,7 @@ pqxx::connection get_db_connection() {
 
   return pqxx::connection(conn_str);
 }
+
+pqxx::connection conn = get_db_connection();
+
+pqxx::work get_transaction() { return pqxx::work(conn); }

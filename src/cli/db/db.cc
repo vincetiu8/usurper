@@ -18,10 +18,8 @@ int db_handler(cli_args &args) {
   std::string_view command = args[2];
   std::string_view statement = args[3];
 
-  pqxx::connection conn = get_db_connection();
-
   if (command == "query") {
-    pqxx::work w(conn);
+    pqxx::work w = get_transaction();
     pqxx::result r = w.exec(statement.data());
     w.commit();
     for (auto row : r) {
@@ -34,7 +32,7 @@ int db_handler(cli_args &args) {
   }
 
   if (command == "execute") {
-    pqxx::work w(conn);
+    pqxx::work w = get_transaction();
     w.exec(statement.data());
     w.commit();
     return 0;
