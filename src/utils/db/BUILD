@@ -2,10 +2,9 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "db",
-    srcs = ["db.cc"],
     hdrs = ["db.h"],
+    srcs = ["db.cc"],
     deps = [
-      "@boost//:asio",
       "//src/utils/config",
       "@libpqxx//:libpqxx",
     ],
