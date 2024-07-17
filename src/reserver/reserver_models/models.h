@@ -1,15 +1,14 @@
 #pragma once
 
-#include <string>
-
 #include "src/utils/geo/geo.h"
 #include "src/utils/time/time.h"
+#include <string>
 
 /**
  * represents a unique user in the system
  */
 class User {
- public:
+public:
   // primary key
   int id;
 
@@ -17,7 +16,7 @@ class User {
 };
 
 class ReservationService {
- public:
+public:
   // primary key
   std::string code;
 
@@ -25,7 +24,7 @@ class ReservationService {
 };
 
 class ReservationServiceUser {
- public:
+public:
   ReservationService reservation_service;
 
   User user;
@@ -35,13 +34,13 @@ class ReservationServiceUser {
 };
 
 class Cuisine {
- public:
+public:
   // primary key
   std::string name;
 };
 
 class Restaurant {
- public:
+public:
   // primary key
   // int id;
   std::string name;
@@ -61,7 +60,7 @@ class Restaurant {
 };
 
 class Timeslot {
- public:
+public:
   // primary key
   int id;
 
@@ -79,7 +78,7 @@ class Timeslot {
 };
 
 class Booking {
- public:
+public:
   int timeslot_id;
   Timeslot timeslot;
 

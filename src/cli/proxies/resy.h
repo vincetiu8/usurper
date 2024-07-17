@@ -5,4 +5,4 @@
 /**
  * parses a command to interact with the resy API
  */
-int resy_handler(cli_args& args);
+int resy_handler(cli_args &args);

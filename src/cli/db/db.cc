@@ -1,9 +1,7 @@
 #include "src/utils/db/db.h"
-
+#include "src/utils/cli/cli_args.h"
 #include <iostream>
 #include <pqxx/pqxx>
-
-#include "src/utils/cli/cli_args.h"
 
 int db_handler(cli_args &args) {
   if (args.size() < 3) {

@@ -5,9 +5,9 @@
 /**
  * parses a command to interact with the http string client
  */
-int http_string_handler(cli_args& args);
+int http_string_handler(cli_args &args);
 
 /**
  * parses a command to interact with the http json client
  */
-int http_json_handler(cli_args& args);
+int http_json_handler(cli_args &args);

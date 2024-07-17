@@ -1,10 +1,9 @@
-#include <iostream>
-
 #include "src/utils/cli/cli_args.h"
 #include "src/utils/http_clients/http_json_client.h"
 #include "src/utils/http_clients/http_string_client.h"
+#include <iostream>
 
-int http_string_handler(cli_args& args) {
+int http_string_handler(cli_args &args) {
   if (args.size() < 4) {
     std::cout << "no method specified" << '\n';
     return 1;
@@ -32,7 +31,7 @@ int http_string_handler(cli_args& args) {
   }
 
   if (method == "post") {
-    std::string content = "";
+    std::string_view content = "";
     if (args.size() >= 7) {
       content = args[6];
     }
@@ -46,7 +45,7 @@ int http_string_handler(cli_args& args) {
   return 1;
 }
 
-int http_json_handler(cli_args& args) {
+int http_json_handler(cli_args &args) {
   if (args.size() < 4) {
     std::cout << "no method specified" << '\n';
     return 1;
@@ -74,14 +73,27 @@ int http_json_handler(cli_args& args) {
   }
 
   if (method == "post") {
-    std::string content = "";
+    std::string_view content = "";
     if (args.size() >= 7) {
       content = args[6];
     }
 
     json::value content_json = json::parse(content);
 
-    json::value s = http_client.post(target, content_json);
+    json::value s = http_client.post_json(target, content_json);
+    std::cout << s << '\n';
+    return 0;
+  }
+
+  if (method == "post-form-data") {
+    if (args.size() < 7) {
+      std::cout << "no content specified" << '\n';
+      return 1;
+    }
+
+    std::string_view content = args[6];
+
+    json::value s = http_client.post_form_data(target, content);
     std::cout << s << '\n';
     return 0;
   }

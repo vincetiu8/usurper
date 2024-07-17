@@ -8,6 +8,7 @@ cc_library(
     "//src/reserver/proxies/resy",
     "//src/utils/cli",
     "//src/utils/http_clients",
+    "//src/utils/config",
   ],
   visibility = ["//src/cli:__pkg__"],
 )

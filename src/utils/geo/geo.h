@@ -1,14 +1,17 @@
 #pragma once
 
 #include <string>
-#include <utility>
+
+class GeoCoordinates {
+public:
+  double latitude;
+  double longitude;
+};
 
 class Locality {
- public:
+public:
   // name of the location
   std::string name;
 
-  double latitude;
-
-  double longitude;
+  GeoCoordinates coordinates;
 };

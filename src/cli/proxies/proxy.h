@@ -5,4 +5,4 @@
 /**
  * parses a command to interact with one of the proxy APIs
  */
-int proxy_handler(cli_args& args);
+int proxy_handler(cli_args &args);

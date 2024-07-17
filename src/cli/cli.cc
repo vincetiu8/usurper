@@ -1,13 +1,11 @@
 #include "src/utils/cli/cli.h"
-
-#include <iostream>
-#include <string_view>
-
 #include "src/cli/db/db.h"
 #include "src/cli/proxies/proxy.h"
 #include "src/utils/cli/cli_args.h"
+#include <iostream>
+#include <string_view>
 
-int command_handler(cli_args& args) {
+int command_handler(cli_args &args) {
   if (args.size() < 2) {
     std::cout << "no command specified" << '\n';
     return 1;
@@ -30,7 +28,7 @@ int command_handler(cli_args& args) {
 /**
  * entrypoint into the cli
  */
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   cli_args args(argc);
 
   process_args(argc, argv, args);
