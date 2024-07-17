@@ -26,17 +26,17 @@ class HttpClient {
 
   const std::unordered_map<http::field, std::string> headers;
 
- protected:
+protected:
   HttpClient(std::string_view _host, std::string_view _port,
              std::unordered_map<http::field, std::string> _headers);
 
- private:
+private:
   static ssl::stream<beast::tcp_stream> get_stream(std::string_view host,
                                                    std::string_view port);
 
   std::string run_request(http::request<http::string_body> req);
 
- protected:
+protected:
   std::string get(std::string_view target);
 
   std::string post(std::string_view target, beast::string_view content_type);

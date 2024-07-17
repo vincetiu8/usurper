@@ -3,13 +3,13 @@
 #include <string>
 
 class GeoCoordinates {
- public:
+public:
   double latitude;
   double longitude;
 };
 
 class Locality {
- public:
+public:
   // name of the location
   std::string name;
 

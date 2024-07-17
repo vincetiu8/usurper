@@ -1,11 +1,9 @@
 #include "src/utils/http_clients/http_json_client.h"
-
+#include "src/utils/http_clients/http_client.h"
 #include <boost/json.hpp>
 #include <string>
 #include <string_view>
 #include <unordered_map>
-
-#include "src/utils/http_clients/http_client.h"
 
 namespace json = boost::json;
 

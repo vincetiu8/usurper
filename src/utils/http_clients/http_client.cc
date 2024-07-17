@@ -1,5 +1,5 @@
 #include "src/utils/http_clients/http_client.h"
-
+#include "src/utils/http_clients/root_certificates.h"
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/beast/ssl.hpp>
@@ -7,8 +7,6 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-
-#include "src/utils/http_clients/root_certificates.h"
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -18,10 +16,8 @@ using tcp = asio::ip::tcp;
 
 HttpClient::HttpClient(std::string_view _host, std::string_view _port,
                        std::unordered_map<http::field, std::string> _headers)
-    : host_bs{_host.data(), _host.size()},
-      stream{get_stream(_host, _port)},
-      http_version{11},
-      headers{_headers} {}
+    : host_bs{_host.data(), _host.size()}, stream{get_stream(_host, _port)},
+      http_version{11}, headers{_headers} {}
 
 ssl::stream<beast::tcp_stream> HttpClient::get_stream(std::string_view host,
                                                       std::string_view port) {
@@ -56,7 +52,7 @@ ssl::stream<beast::tcp_stream> HttpClient::get_stream(std::string_view host,
 }
 
 std::string HttpClient::run_request(http::request<http::string_body> req) {
-  for (auto& [field, value] : headers) {
+  for (auto &[field, value] : headers) {
     req.set(field, value);
   }
 
@@ -69,7 +65,7 @@ std::string HttpClient::run_request(http::request<http::string_body> req) {
 
   std::string s{};
   for (auto seq : res.body().data()) {
-    auto* cbuf = boost::asio::buffer_cast<const char*>(seq);
+    auto *cbuf = boost::asio::buffer_cast<const char *>(seq);
     s.append(cbuf, boost::asio::buffer_size(seq));
   }
 

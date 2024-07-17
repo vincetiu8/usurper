@@ -1,11 +1,10 @@
 #pragma once
 
+#include "models.h"
 #include <vector>
 
-#include "models.h"
-
 class ReservationProxy {
- public:
+public:
   std::vector<Restaurant> filter_restaurants(std::string_view name,
                                              Locality locality);
 

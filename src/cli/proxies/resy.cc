@@ -1,10 +1,9 @@
+#include "src/reserver/proxies/resy/api.h"
+#include "src/utils/cli/cli_args.h"
 #include <iostream>
 #include <string_view>
 
-#include "src/reserver/proxies/resy/api.h"
-#include "src/utils/cli/cli_args.h"
-
-int resy_handler(cli_args& args) {
+int resy_handler(cli_args &args) {
   if (args.size() < 4) {
     std::cout << "no resy command specified" << '\n';
     return 1;

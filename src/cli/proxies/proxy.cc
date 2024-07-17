@@ -1,12 +1,11 @@
+#include "src/cli/proxies/http_clients.h"
+#include "src/cli/proxies/resy.h"
+#include "src/utils/cli/cli_args.h"
 #include <iostream>
 #include <string>
 #include <string_view>
 
-#include "src/cli/proxies/http_clients.h"
-#include "src/cli/proxies/resy.h"
-#include "src/utils/cli/cli_args.h"
-
-int proxy_handler(cli_args& args) {
+int proxy_handler(cli_args &args) {
   if (args.size() < 3) {
     std::cout << "no proxy specified" << '\n';
     return 1;

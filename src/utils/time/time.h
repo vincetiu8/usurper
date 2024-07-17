@@ -6,10 +6,10 @@
 namespace chrono = std::chrono;
 
 class Date {
- public:
+public:
   Date(int year, int month, int date, int day);
 
-  Date(const std::string& date_str, const std::string& format);
+  Date(const std::string &date_str, const std::string &format);
 
   // year
   int year;
@@ -29,10 +29,10 @@ class Date {
 };
 
 class Time {
- public:
+public:
   Time(int hour, int minute);
 
-  Time(const std::string& time_str, const std::string& format);
+  Time(const std::string &time_str, const std::string &format);
 
   int hour;
 

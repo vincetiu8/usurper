@@ -1,10 +1,9 @@
-#include <iostream>
-
 #include "src/utils/cli/cli_args.h"
 #include "src/utils/http_clients/http_json_client.h"
 #include "src/utils/http_clients/http_string_client.h"
+#include <iostream>
 
-int http_string_handler(cli_args& args) {
+int http_string_handler(cli_args &args) {
   if (args.size() < 4) {
     std::cout << "no method specified" << '\n';
     return 1;
@@ -46,7 +45,7 @@ int http_string_handler(cli_args& args) {
   return 1;
 }
 
-int http_json_handler(cli_args& args) {
+int http_json_handler(cli_args &args) {
   if (args.size() < 4) {
     std::cout << "no method specified" << '\n';
     return 1;

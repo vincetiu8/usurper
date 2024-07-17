@@ -1,12 +1,11 @@
 #pragma once
 
-#include <boost/json.hpp>
-#include <string>
-#include <vector>
-
 #include "src/reserver/proxies/resy/http_client.h"
 #include "src/utils/geo/geo.h"
 #include "src/utils/time/time.h"
+#include <boost/json.hpp>
+#include <string>
+#include <vector>
 
 /**
  * direct api to resy methods
@@ -14,17 +13,17 @@
 class ResyApi {
   ResyHttpClient http_client;
 
- public:
+public:
   ResyApi();
 
   class LoginInput {
-   public:
+  public:
     std::string_view email;
     std::string_view password;
   };
 
   class LoginOutput {
-   public:
+  public:
     std::string token;
   };
 
@@ -34,19 +33,19 @@ class ResyApi {
   LoginOutput login(LoginInput input);
 
   class SearchInput {
-   public:
+  public:
     GeoCoordinates geo;
     std::string_view query;
   };
 
   class SearchOutputHit {
-   public:
+  public:
     std::string name;
     int id;
   };
 
   class SearchOutput {
-   public:
+  public:
     std::vector<SearchOutputHit> hits;
   };
 
@@ -56,14 +55,14 @@ class ResyApi {
   SearchOutput venue_search(SearchInput input);
 
   class FindInput {
-   public:
+  public:
     int venue_id;
     int party_size;
     Date day;
   };
 
   class FindOutputSlot {
-   public:
+  public:
     int id;
     std::string token;
     Time start_time;
@@ -73,7 +72,7 @@ class ResyApi {
   };
 
   class FindOutput {
-   public:
+  public:
     int id;
     std::vector<FindOutputSlot> slots;
   };
@@ -84,14 +83,14 @@ class ResyApi {
   FindOutput find(FindInput input);
 
   class DetailsInput {
-   public:
+  public:
     std::string_view config_id;
     Date day;
     int party_size;
   };
 
   class DetailsOutput {
-   public:
+  public:
     std::string book_token;
   };
 
@@ -101,12 +100,12 @@ class ResyApi {
   DetailsOutput details(DetailsInput input);
 
   class BookInput {
-   public:
+  public:
     std::string_view book_token;
   };
 
   class BookOutput {
-   public:
+  public:
     std::string resy_token;
     int reservation_id;
   };

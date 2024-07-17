@@ -1,7 +1,6 @@
+#include "src/utils/config/config.h"
 #include <pqxx/pqxx>
 #include <string>
-
-#include "src/utils/config/config.h"
 
 pqxx::connection get_db_connection() {
   std::string conn_str = "postgresql://";

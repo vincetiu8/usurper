@@ -1,10 +1,8 @@
 #include "src/utils/http_clients/http_string_client.h"
-
+#include "src/utils/http_clients/http_client.h"
 #include <string>
 #include <string_view>
 #include <unordered_map>
-
-#include "src/utils/http_clients/http_client.h"
 
 HttpStringClient::HttpStringClient(
     std::string_view _host, std::string_view _port,

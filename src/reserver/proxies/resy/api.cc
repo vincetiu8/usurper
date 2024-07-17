@@ -1,8 +1,6 @@
 #include "src/reserver/proxies/resy/api.h"
-
-#include <boost/json.hpp>
-
 #include "src/reserver/proxies/resy/http_client.h"
+#include <boost/json.hpp>
 
 namespace json = boost::json;
 
@@ -17,8 +15,8 @@ ResyApi::LoginOutput ResyApi::login(LoginInput input) {
 
   json::value data = http_client.post_form_data(target, content);
 
-  const json::object& data_obj = data.as_object();
-  const json::string& token = data_obj.at("token").as_string();
+  const json::object &data_obj = data.as_object();
+  const json::string &token = data_obj.at("token").as_string();
 
   LoginOutput output{
       .token = token.c_str(),
@@ -41,13 +39,13 @@ ResyApi::SearchOutput ResyApi::venue_search(SearchInput input) {
 
   json::value data = http_client.post_json(target, content);
 
-  const json::object& data_obj = data.as_object();
-  const json::array& hits_arr = data_obj.at("search").at("hits").as_array();
+  const json::object &data_obj = data.as_object();
+  const json::array &hits_arr = data_obj.at("search").at("hits").as_array();
 
   SearchOutput output{};
   output.hits.reserve(hits_arr.size());
 
-  for (const json::value& hit : hits_arr) {
+  for (const json::value &hit : hits_arr) {
     SearchOutputHit hit_obj{
         .name = hit.at("name").as_string().c_str(),
         .id = static_cast<int>(hit.at("id").as_int64()),
@@ -69,8 +67,8 @@ ResyApi::FindOutput ResyApi::find(FindInput input) {
 
   json::value data = http_client.get(target);
 
-  const json::object& data_obj = data.as_object();
-  const json::array& slots_arr =
+  const json::object &data_obj = data.as_object();
+  const json::array &slots_arr =
       data_obj.at("results").at("venues").at(0).at("slots").as_array();
 
   FindOutput output{};
@@ -78,7 +76,7 @@ ResyApi::FindOutput ResyApi::find(FindInput input) {
 
   const std::string format = "%Y-%m-%d %H:%M:%S";
 
-  for (const json::value& slot : slots_arr) {
+  for (const json::value &slot : slots_arr) {
     FindOutputSlot slot_obj{
         .id = static_cast<int>(slot.at("id").as_int64()),
         .token = slot.at("token").as_string().c_str(),
@@ -105,8 +103,8 @@ ResyApi::DetailsOutput ResyApi::details(DetailsInput input) {
 
   json::value data = http_client.post_json(target, content);
 
-  const json::object& data_obj = data.as_object();
-  const json::string& book_token =
+  const json::object &data_obj = data.as_object();
+  const json::string &book_token =
       data_obj.at("book_token").at("value").as_string();
 
   DetailsOutput output{
@@ -123,8 +121,8 @@ ResyApi::BookOutput ResyApi::book(BookInput input) {
 
   json::value data = http_client.get(target);
 
-  const json::object& data_obj = data.as_object();
-  const json::string& resy_token = data_obj.at("resy_token").as_string();
+  const json::object &data_obj = data.as_object();
+  const json::string &resy_token = data_obj.at("resy_token").as_string();
   const int reservation_id =
       static_cast<int>(data_obj.at("reservation_id").as_int64());
 

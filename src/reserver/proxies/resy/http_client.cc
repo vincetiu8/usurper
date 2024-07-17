@@ -1,9 +1,7 @@
 #include "src/reserver/proxies/resy/http_client.h"
-
-#include <string>
-
 #include "src/utils/config/config.h"
 #include "src/utils/http_clients/http_json_client.h"
+#include <string>
 
 ResyHttpClient::ResyHttpClient()
     : HttpJsonClient(

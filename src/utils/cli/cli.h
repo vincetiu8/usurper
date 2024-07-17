@@ -6,4 +6,4 @@
 /**
  * processes cli arguments into c++ 'safe' types
  */
-void process_args(int argc, char* argv[], std::vector<std::string_view>& args);
+void process_args(int argc, char *argv[], std::vector<std::string_view> &args);

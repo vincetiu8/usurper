@@ -6,6 +6,6 @@
  * wrapper around HttpClient for the resy endpoint
  */
 class ResyHttpClient : public HttpJsonClient {
- public:
+public:
   ResyHttpClient();
 };

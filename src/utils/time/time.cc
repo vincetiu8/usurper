@@ -1,5 +1,4 @@
 #include "src/utils/time/time.h"
-
 #include <chrono>
 #include <ctime>
 #include <string>
@@ -7,7 +6,7 @@
 Date::Date(int year, int month, int date, int day)
     : year(year), month(month), date(date), day(day) {}
 
-Date::Date(const std::string& date_str, const std::string& format) {
+Date::Date(const std::string &date_str, const std::string &format) {
   tm tm = {};
   strptime(date_str.c_str(), format.c_str(), &tm);
   year = tm.tm_year + 1900;
@@ -30,7 +29,7 @@ std::string Date::to_yyyy_mm_dd_string() {
 
 Time::Time(int hour, int minute) : hour(hour), minute(minute) {}
 
-Time::Time(const std::string& time_str, const std::string& format) {
+Time::Time(const std::string &time_str, const std::string &format) {
   tm tm = {};
   strptime(time_str.c_str(), format.c_str(), &tm);
   hour = tm.tm_hour;
