@@ -17,6 +17,22 @@ class ResyApi {
  public:
   ResyApi();
 
+  class LoginInput {
+   public:
+    std::string_view email;
+    std::string_view password;
+  };
+
+  class LoginOutput {
+   public:
+    std::string token;
+  };
+
+  /**
+   * endpoint to login
+   */
+  LoginOutput login(LoginInput input);
+
   class SearchInput {
    public:
     GeoCoordinates geo;
@@ -36,7 +52,6 @@ class ResyApi {
 
   /**
    * endpoint to search for restaurants
-   * api.resy.com/3/venuesearch/search
    */
   SearchOutput venue_search(SearchInput input);
 
@@ -65,7 +80,6 @@ class ResyApi {
 
   /**
    * endpoint to find reservations
-   * api.resy.com/4/find
    */
   FindOutput find(FindInput input);
 
@@ -83,7 +97,6 @@ class ResyApi {
 
   /**
    * endpoint to get details on a reservation
-   * api.resy.com/3/details
    */
   DetailsOutput details(DetailsInput input);
 
@@ -100,7 +113,6 @@ class ResyApi {
 
   /**
    * endpoint to book a reservation
-   * api.resy.com/3/book
    */
   BookOutput book(BookInput);
 };

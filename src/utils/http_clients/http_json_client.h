@@ -3,8 +3,8 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <boost/json.hpp>
-#include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include "src/utils/http_clients/http_client.h"
 
@@ -17,9 +17,12 @@ namespace json = boost::json;
 */
 class HttpJsonClient : HttpClient {
  public:
-  HttpJsonClient(std::string_view host, std::string_view port = "80");
+  HttpJsonClient(std::string_view _host, std::string_view _port = "443",
+                 std::unordered_map<http::field, std::string> _headers = {});
 
   json::value get(std::string_view target);
 
-  json::value post(std::string_view target, json::value content);
+  json::value post_json(std::string_view target, json::value content);
+
+  json::value post_form_data(std::string_view target, std::string_view content);
 };
