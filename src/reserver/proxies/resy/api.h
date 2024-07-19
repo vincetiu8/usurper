@@ -24,7 +24,7 @@ public:
 
   class LoginOutput {
   public:
-    std::string token;
+    std::string auth_token;
   };
 
   /**
@@ -34,6 +34,7 @@ public:
 
   class SearchInput {
   public:
+    std::string_view auth_token;
     GeoCoordinates geo;
     std::string_view query;
   };
@@ -52,10 +53,11 @@ public:
   /**
    * endpoint to search for restaurants
    */
-  SearchOutput venue_search(SearchInput input);
+  SearchOutput search(SearchInput input);
 
   class FindInput {
   public:
+    std::string_view auth_token;
     int venue_id;
     int party_size;
     Date day;
@@ -84,6 +86,7 @@ public:
 
   class DetailsInput {
   public:
+    std::string_view auth_token;
     std::string_view config_id;
     Date day;
     int party_size;
@@ -101,6 +104,7 @@ public:
 
   class BookInput {
   public:
+    std::string_view auth_token;
     std::string_view book_token;
   };
 

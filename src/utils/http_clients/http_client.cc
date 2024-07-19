@@ -6,7 +6,6 @@
 #include <iostream>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -15,17 +14,16 @@ namespace ssl = asio::ssl;
 using tcp = asio::ip::tcp;
 
 HttpClient::HttpClient(std::string_view _host, std::string_view _port,
-                       std::unordered_map<http::field, std::string> _headers)
-    : host_bs{_host.data(), _host.size()}, stream{get_stream(_host, _port)},
-      http_version{11}, headers{_headers} {}
+                       headers_t _headers)
+    : host_bs{_host.data(), _host.size()}, ioc{},
+      ctx{ssl::context::tlsv13_client},
+      stream{get_stream(_host, _port, ioc, ctx)}, http_version{11},
+      headers{_headers} {}
 
 ssl::stream<beast::tcp_stream> HttpClient::get_stream(std::string_view host,
-                                                      std::string_view port) {
-  // we assume the servers all use SSL
-  asio::io_context ioc;
-
-  ssl::context ctx{ssl::context::tls};
-
+                                                      std::string_view port,
+                                                      asio::io_context &ioc,
+                                                      ssl::context &ctx) {
   ctx.set_default_verify_paths();
 
   load_root_certificates(ctx);
@@ -51,8 +49,32 @@ ssl::stream<beast::tcp_stream> HttpClient::get_stream(std::string_view host,
   return stream;
 }
 
-std::string HttpClient::run_request(http::request<http::string_body> req) {
+HttpClient::~HttpClient() {
+  beast::error_code ec;
+  stream.shutdown(ec);
+  if (ec == asio::error::eof || ec == ssl::error::stream_truncated) {
+    ec = {};
+  }
+  if (ec) {
+    std::cerr << "error on stream shutdown " << ec.message() << std::endl;
+  }
+  stream.lowest_layer().close(ec);
+  if (ec) {
+    std::cerr << "error on lowest layer close " << ec.message() << std::endl;
+  }
+}
+
+std::string HttpClient::run_request(http::request<http::string_body> &req,
+                                    headers_t _headers) {
+  std::cout << stream.lowest_layer().remote_endpoint().address().to_string()
+            << ' ' << req.target() << '\n';
+
   for (auto &[field, value] : headers) {
+    std::cout << "setting " << field << " to " << value << '\n';
+    req.set(field, value);
+  }
+  for (auto &[field, value] : _headers) {
+    std::cout << "setting " << field << " to " << value << '\n';
     req.set(field, value);
   }
 
@@ -69,10 +91,12 @@ std::string HttpClient::run_request(http::request<http::string_body> req) {
     s.append(cbuf, boost::asio::buffer_size(seq));
   }
 
+  std::cout << s << '\n';
+
   return s;
 }
 
-std::string HttpClient::get(std::string_view target) {
+std::string HttpClient::get(std::string_view target, headers_t headers) {
   if (target.length() == 0) {
     target = "/";
   }
@@ -80,13 +104,11 @@ std::string HttpClient::get(std::string_view target) {
   beast::string_view target_bs{target.data(), target.size()};
   http::request<http::string_body> req{http::verb::get, target_bs,
                                        http_version};
-  req.set(http::field::host, host_bs);
 
-  return run_request(req);
+  return run_request(req, headers);
 }
 
-std::string HttpClient::post(std::string_view target,
-                             beast::string_view content_type) {
+std::string HttpClient::post(std::string_view target, headers_t headers) {
   if (target.length() == 0) {
     target = "/";
   }
@@ -97,13 +119,12 @@ std::string HttpClient::post(std::string_view target,
                                        http_version};
 
   req.set(http::field::host, host_bs);
-  req.set(http::field::content_type, content_type);
 
-  return run_request(req);
+  return run_request(req, headers);
 }
 
 std::string HttpClient::post(std::string_view target, std::string_view content,
-                             beast::string_view content_type) {
+                             headers_t headers) {
   if (target.length() == 0) {
     target = "/";
   }
@@ -114,8 +135,7 @@ std::string HttpClient::post(std::string_view target, std::string_view content,
                                        http_version, content};
 
   req.set(http::field::host, host_bs);
-  req.set(http::field::content_type, content_type);
   req.prepare_payload();
 
-  return run_request(req);
+  return run_request(req, headers);
 }

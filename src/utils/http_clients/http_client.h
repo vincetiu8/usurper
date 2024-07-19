@@ -13,6 +13,8 @@ namespace asio = boost::asio;
 namespace ssl = asio::ssl;
 using tcp = asio::ip::tcp;
 
+using headers_t = std::unordered_map<std::string, std::string>;
+
 /**
  * abstract client for interacting with external http endpoints.
  * supports get and post requests.
@@ -21,26 +23,32 @@ class HttpClient {
   const beast::string_view host_bs;
 
   asio::io_context ioc;
+  ssl::context ctx;
   ssl::stream<beast::tcp_stream> stream;
   const int http_version;
 
-  const std::unordered_map<http::field, std::string> headers;
+  headers_t headers;
 
 protected:
   HttpClient(std::string_view _host, std::string_view _port,
-             std::unordered_map<http::field, std::string> _headers);
+             headers_t _headers);
+
+  ~HttpClient();
 
 private:
   static ssl::stream<beast::tcp_stream> get_stream(std::string_view host,
-                                                   std::string_view port);
+                                                   std::string_view port,
+                                                   asio::io_context &ioc,
+                                                   ssl::context &ctx);
 
-  std::string run_request(http::request<http::string_body> req);
+  std::string run_request(http::request<http::string_body> &req,
+                          headers_t _headers);
 
 protected:
-  std::string get(std::string_view target);
+  std::string get(std::string_view target, headers_t headers);
 
-  std::string post(std::string_view target, beast::string_view content_type);
+  std::string post(std::string_view target, headers_t headers);
 
   std::string post(std::string_view target, std::string_view content,
-                   beast::string_view content_type);
+                   headers_t headers);
 };

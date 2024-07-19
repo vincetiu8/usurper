@@ -1,6 +1,7 @@
 #include "src/reserver/proxies/resy/api.h"
 #include "src/reserver/proxies/resy/http_client.h"
 #include <boost/json.hpp>
+#include <iostream>
 
 namespace json = boost::json;
 
@@ -13,19 +14,19 @@ ResyApi::LoginOutput ResyApi::login(LoginInput input) {
   content += "&password=";
   content += input.password;
 
-  json::value data = http_client.post_form_data(target, content);
+  json::value data = http_client.post_form_data(target, content, {});
 
   const json::object &data_obj = data.as_object();
   const json::string &token = data_obj.at("token").as_string();
 
   LoginOutput output{
-      .token = token.c_str(),
+      .auth_token = token.c_str(),
   };
 
   return output;
 };
 
-ResyApi::SearchOutput ResyApi::venue_search(SearchInput input) {
+ResyApi::SearchOutput ResyApi::search(SearchInput input) {
   const std::string target = "/3/venuesearch/search";
 
   json::value content{
@@ -37,7 +38,12 @@ ResyApi::SearchOutput ResyApi::venue_search(SearchInput input) {
       {"query", input.query},
   };
 
-  json::value data = http_client.post_json(target, content);
+  headers_t headers = {
+      {"X-Resy-Auth-Token", std::string(input.auth_token)},
+      {"X-Resy-Universal-Auth", std::string(input.auth_token)},
+  };
+
+  json::value data = http_client.post_json(target, content, headers);
 
   const json::object &data_obj = data.as_object();
   const json::array &hits_arr = data_obj.at("search").at("hits").as_array();
@@ -48,7 +54,7 @@ ResyApi::SearchOutput ResyApi::venue_search(SearchInput input) {
   for (const json::value &hit : hits_arr) {
     SearchOutputHit hit_obj{
         .name = hit.at("name").as_string().c_str(),
-        .id = static_cast<int>(hit.at("id").as_int64()),
+        .id = static_cast<int>(hit.at("id").at("resy").as_int64()),
     };
     output.hits.push_back(hit_obj);
   }
@@ -57,15 +63,20 @@ ResyApi::SearchOutput ResyApi::venue_search(SearchInput input) {
 };
 
 ResyApi::FindOutput ResyApi::find(FindInput input) {
-  std::string target = "/3/find";
-  target += "?venue_id=";
-  target += std::to_string(input.venue_id);
-  target += "&party_size=";
-  target += std::to_string(input.party_size);
+  std::string target = "/4/find?lat=0&long=0";
   target += "&day=";
   target += input.day.to_yyyy_mm_dd_string();
+  target += "&party_size=";
+  target += std::to_string(input.party_size);
+  target += "&venue_id=";
+  target += std::to_string(input.venue_id);
 
-  json::value data = http_client.get(target);
+  // headers_t headers = {
+  //     {"X-Resy-Auth-Token", std::string(input.auth_token)},
+  //     {"X-Resy-Universal-Auth", std::string(input.auth_token)},
+  // };
+
+  json::value data = http_client.get(target, {});
 
   const json::object &data_obj = data.as_object();
   const json::array &slots_arr =
@@ -78,12 +89,13 @@ ResyApi::FindOutput ResyApi::find(FindInput input) {
 
   for (const json::value &slot : slots_arr) {
     FindOutputSlot slot_obj{
-        .id = static_cast<int>(slot.at("id").as_int64()),
-        .token = slot.at("token").as_string().c_str(),
-        .start_time = Time(slot.at("start_time").as_string().c_str(), format),
-        .end_time = Time(slot.at("end_time").as_string().c_str(), format),
-        .min_size = static_cast<int>(slot.at("min_size").as_int64()),
-        .max_size = static_cast<int>(slot.at("max_size").as_int64()),
+        .id = static_cast<int>(slot.at("config").at("id").as_int64()),
+        .token = slot.at("config").at("token").as_string().c_str(),
+        .start_time =
+            Time(slot.at("date").at("start").as_string().c_str(), format),
+        .end_time = Time(slot.at("date").at("end").as_string().c_str(), format),
+        .min_size = static_cast<int>(slot.at("size").at("min").as_int64()),
+        .max_size = static_cast<int>(slot.at("size").at("max").as_int64()),
     };
     output.slots.push_back(slot_obj);
   }
@@ -101,7 +113,12 @@ ResyApi::DetailsOutput ResyApi::details(DetailsInput input) {
       {"day", input.day.to_yyyy_mm_dd_string()},
   };
 
-  json::value data = http_client.post_json(target, content);
+  headers_t headers = {
+      {"X-Resy-Auth-Token", std::string(input.auth_token)},
+      {"X-Resy-Universal-Auth", std::string(input.auth_token)},
+  };
+
+  json::value data = http_client.post_json(target, content, headers);
 
   const json::object &data_obj = data.as_object();
   const json::string &book_token =
@@ -116,10 +133,16 @@ ResyApi::DetailsOutput ResyApi::details(DetailsInput input) {
 
 ResyApi::BookOutput ResyApi::book(BookInput input) {
   std::string target = "/3/book";
-  target += "?book_token=";
-  target += input.book_token;
+  std::string content = "book_token=";
+  content += input.book_token;
+  content += "&source_id=resy.com-venue-details&venue_marketing_opt_in=0";
 
-  json::value data = http_client.get(target);
+  headers_t headers = {
+      {"X-Resy-Auth-Token", std::string(input.auth_token)},
+      {"X-Resy-Universal-Auth", std::string(input.auth_token)},
+  };
+
+  json::value data = http_client.post_form_data(target, content, headers);
 
   const json::object &data_obj = data.as_object();
   const json::string &resy_token = data_obj.at("resy_token").as_string();
