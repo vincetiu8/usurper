@@ -6,14 +6,16 @@
 
 HttpStringClient::HttpStringClient(
     std::string_view _host, std::string_view _port,
-    std::unordered_map<http::field, std::string> _headers)
+    std::unordered_map<std::string, std::string> _headers)
     : HttpClient(_host, _port, _headers) {}
 
-std::string HttpStringClient::get(std::string_view target) {
-  return HttpClient::get(target);
+std::string HttpStringClient::get(std::string_view target, headers_t headers) {
+  return HttpClient::get(target, headers);
 }
 
 std::string HttpStringClient::post(std::string_view target,
-                                   std::string_view content) {
-  return HttpClient::post(target, content, "text/html");
+                                   std::string_view content,
+                                   headers_t headers) {
+  headers["Content-Type"] = "text/html";
+  return HttpClient::post(target, content, headers);
 }

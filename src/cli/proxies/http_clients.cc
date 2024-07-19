@@ -25,7 +25,7 @@ int http_string_handler(cli_args &args) {
   HttpStringClient http_client{host};
 
   if (method == "get") {
-    std::string s = http_client.get(target);
+    std::string s = http_client.get(target, {});
     std::cout << s << '\n';
     return 0;
   }
@@ -36,7 +36,7 @@ int http_string_handler(cli_args &args) {
       content = args[6];
     }
 
-    std::string s = http_client.post(target, content);
+    std::string s = http_client.post(target, content, {});
     std::cout << s << '\n';
     return 0;
   }
@@ -67,7 +67,7 @@ int http_json_handler(cli_args &args) {
   HttpJsonClient http_client{host};
 
   if (method == "get") {
-    json::value s = http_client.get(target);
+    json::value s = http_client.get(target, {});
     std::cout << s << '\n';
     return 0;
   }
@@ -80,7 +80,7 @@ int http_json_handler(cli_args &args) {
 
     json::value content_json = json::parse(content);
 
-    json::value s = http_client.post_json(target, content_json);
+    json::value s = http_client.post_json(target, content_json, {});
     std::cout << s << '\n';
     return 0;
   }
@@ -93,7 +93,7 @@ int http_json_handler(cli_args &args) {
 
     std::string_view content = args[6];
 
-    json::value s = http_client.post_form_data(target, content);
+    json::value s = http_client.post_form_data(target, content, {});
     std::cout << s << '\n';
     return 0;
   }

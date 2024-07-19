@@ -9,27 +9,29 @@ namespace json = boost::json;
 
 HttpJsonClient::HttpJsonClient(
     std::string_view _host, std::string_view _port,
-    std::unordered_map<http::field, std::string> _headers)
+    std::unordered_map<std::string, std::string> _headers)
     : HttpClient(_host, _port, _headers) {}
 
-json::value HttpJsonClient::get(std::string_view target) {
-  std::string s = HttpClient::get(target);
+json::value HttpJsonClient::get(std::string_view target, headers_t headers) {
+  std::string s = HttpClient::get(target, headers);
   json::value jv = json::parse(s);
   return jv;
 }
 
 json::value HttpJsonClient::post_json(std::string_view target,
-                                      json::value content) {
+                                      json::value content, headers_t headers) {
   std::string content_string = json::serialize(content);
-  std::string s = HttpClient::post(target, content_string, "application/json");
+  headers["Content-Type"] = "application/json";
+  std::string s = HttpClient::post(target, content_string, headers);
   json::value jv = json::parse(s);
   return jv;
 }
 
 json::value HttpJsonClient::post_form_data(std::string_view target,
-                                           std::string_view content) {
-  std::string s =
-      HttpClient::post(target, content, "application/x-www-form-urlencoded");
+                                           std::string_view content,
+                                           headers_t headers) {
+  headers["Content-Type"] = "application/x-www-form-urlencoded";
+  std::string s = HttpClient::post(target, content, headers);
   json::value jv = json::parse(s);
   return jv;
 }

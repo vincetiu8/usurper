@@ -11,3 +11,14 @@ cc_library(
     ],
     visibility = ["//src:__subpackages__"]
 )
+
+cc_binary(
+    name = "http_clients_main",
+    srcs = ["main.cc"],
+    deps = [
+        "@boost//:beast",
+        "@boost//:asio_ssl",
+        "@boost//:json",
+        ":http_clients",
+    ],
+)
