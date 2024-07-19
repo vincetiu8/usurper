@@ -60,7 +60,7 @@ int resy_handler(cli_args &args) {
 
     ResyApi::SearchOutput output = api.search(input);
     for (const ResyApi::SearchOutputHit &hit : output.hits) {
-      std::cout << "hit name: " << hit.name << " id: " << hit.id << '\n';
+      std::cout << "hit name: " << hit.name << "\tid: " << hit.id << '\n';
     }
     return 0;
   }
@@ -97,7 +97,8 @@ int resy_handler(cli_args &args) {
 
     for (ResyApi::FindOutputSlot &slot : output.slots) {
       std::cout << "slot time: " << slot.start_time.to_hh_mm_string()
-                << " id: " << slot.id << '\n';
+                << "\tid: " << slot.id << "\ttimeslot_token: " << slot.token
+                << '\n';
     }
     return 0;
   }
@@ -109,7 +110,7 @@ int resy_handler(cli_args &args) {
     }
 
     if (args.size() < 6) {
-      std::cout << "no config id specified" << '\n';
+      std::cout << "no timeslot token specified" << '\n';
       return 1;
     }
 
@@ -125,7 +126,7 @@ int resy_handler(cli_args &args) {
 
     ResyApi::DetailsInput input{
         .auth_token = args[4],
-        .config_id = args[5],
+        .timeslot_token = args[5],
         .day = Date(std::string(args[6]), "%y-%m-%d"),
         .party_size = std::stoi(std::string(args[7])),
     };
@@ -154,8 +155,29 @@ int resy_handler(cli_args &args) {
 
     ResyApi::BookOutput output = api.book(input);
 
-    std::cout << "resy token: " << output.resy_token
-              << " reservation id: " << output.reservation_id << '\n';
+    std::cout << "booking token: " << output.booking_token
+              << "\treservation id: " << output.reservation_id << '\n';
+    return 0;
+  }
+
+  if (resy_command == "cancel") {
+    if (args.size() < 5) {
+      std::cout << "no auth token specified" << '\n';
+      return 1;
+    }
+
+    if (args.size() < 6) {
+      std::cout << "no booking token specified" << '\n';
+      return 1;
+    }
+
+    ResyApi::CancelInput input{
+        .auth_token = args[4],
+        .booking_token = args[5],
+    };
+
+    api.cancel(input);
+    std::cout << "cancelled" << '\n';
     return 0;
   }
 

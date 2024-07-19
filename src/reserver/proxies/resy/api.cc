@@ -71,10 +71,10 @@ ResyApi::FindOutput ResyApi::find(FindInput input) {
   target += "&venue_id=";
   target += std::to_string(input.venue_id);
 
-  // headers_t headers = {
-  //     {"X-Resy-Auth-Token", std::string(input.auth_token)},
-  //     {"X-Resy-Universal-Auth", std::string(input.auth_token)},
-  // };
+  headers_t headers = {
+      {"X-Resy-Auth-Token", std::string(input.auth_token)},
+      {"X-Resy-Universal-Auth", std::string(input.auth_token)},
+  };
 
   json::value data = http_client.get(target, {});
 
@@ -108,9 +108,9 @@ ResyApi::DetailsOutput ResyApi::details(DetailsInput input) {
 
   json::value content{
       {"commit", 1},
-      {"config_id", input.config_id},
-      {"party_size", input.party_size},
+      {"config_id", input.timeslot_token},
       {"day", input.day.to_yyyy_mm_dd_string()},
+      {"party_size", input.party_size},
   };
 
   headers_t headers = {
@@ -144,15 +144,41 @@ ResyApi::BookOutput ResyApi::book(BookInput input) {
 
   json::value data = http_client.post_form_data(target, content, headers);
 
-  const json::object &data_obj = data.as_object();
+  json::object &data_obj = data.as_object();
   const json::string &resy_token = data_obj.at("resy_token").as_string();
+
+  target = "/3/user/reservations";
+  target += "?resy_token=";
+  target += resy_token;
+  target += "&book_on_behalf_of=false";
+
+  data = http_client.get(target, headers);
+  data_obj = data.as_object();
+
+  const json::object reservation_obj =
+      data_obj.at("reservations").at(0).as_object();
+  const json::string &booking_token =
+      reservation_obj.at("resy_token").as_string();
   const int reservation_id =
-      static_cast<int>(data_obj.at("reservation_id").as_int64());
+      static_cast<int>(reservation_obj.at("reservation_id").as_int64());
 
   BookOutput output{
-      .resy_token = resy_token.c_str(),
+      .booking_token = booking_token.c_str(),
       .reservation_id = reservation_id,
   };
 
   return output;
+};
+
+void ResyApi::cancel(CancelInput input) {
+  std::string target = "/3/cancel";
+  std::string content = "resy_token=";
+  content += input.booking_token;
+
+  headers_t headers = {
+      {"X-Resy-Auth-Token", std::string(input.auth_token)},
+      {"X-Resy-Universal-Auth", std::string(input.auth_token)},
+  };
+
+  http_client.post_form_data(target, content, headers);
 };
