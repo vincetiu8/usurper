@@ -37,8 +37,7 @@ int main(int argc, char **argv) {
   try {
     auto const host = "api.resy.com";
     auto const port = "443";
-    auto const target =
-        "/4/find?lat=0&long=0&day=2024-07-19&party_size=2&venue_id=57089";
+    auto const target = "/3/details";
     int version = 11;
 
     // The io_context is required for all I/O
@@ -73,10 +72,19 @@ int main(int argc, char **argv) {
     // Perform the SSL handshake
     stream.handshake(ssl::stream_base::client);
 
+    std::string content = "{\"commit\":1,\"config_id\":\"rgs://resy/38245/"
+                          "910381/2/2024-07-26/2024-07-26/18:00:00/2/Dining "
+                          "Room\",\"day\":\"2024-07-26\",\"party_size\":\"2\"}";
+
     // Set up an HTTP GET request message
-    http::request<http::string_body> req{http::verb::get, target, version};
+    http::request<http::string_body> req{http::verb::post, target, version,
+                                         content};
     req.set(http::field::host, host);
-    req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+    // req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+    req.set(http::field::authorization,
+            "ResyAPI api_key=\"VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5\"");
+    req.set(http::field::content_type, "application/json");
+    req.prepare_payload();
 
     // Send the HTTP request to the remote host
     http::write(stream, req);

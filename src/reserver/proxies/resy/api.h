@@ -87,7 +87,7 @@ public:
   class DetailsInput {
   public:
     std::string_view auth_token;
-    std::string_view config_id;
+    std::string_view timeslot_token;
     Date day;
     int party_size;
   };
@@ -110,7 +110,7 @@ public:
 
   class BookOutput {
   public:
-    std::string resy_token;
+    std::string booking_token;
     int reservation_id;
   };
 
@@ -118,4 +118,15 @@ public:
    * endpoint to book a reservation
    */
   BookOutput book(BookInput);
+
+  class CancelInput {
+  public:
+    std::string_view auth_token;
+    std::string_view booking_token;
+  };
+
+  /**
+   * endpoint to cancel a reservation
+   */
+  void cancel(CancelInput input);
 };
