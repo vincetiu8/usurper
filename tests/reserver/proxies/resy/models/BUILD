@@ -1,13 +1,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
 cc_test(
-    name = "test_resy",
+    name = "test_resy_models",
     defines = ["CATCH_CONFIG_MAIN"],
     srcs = glob(["*.cc"]),
     deps = [
       "//src/utils/db",
-      "//src/reserver/reserver_models",
-      "//src/reserver/proxies/resy",
+      "//src/reserver/proxies/resy/models",
       "@catch2//:catch2_main",
     ],
 )

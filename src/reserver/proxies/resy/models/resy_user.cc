@@ -1,4 +1,4 @@
-#include "src/reserver/proxies/resy/resy_user.h"
+#include "src/reserver/proxies/resy/models/resy_user.h"
 #include "src/utils/db/db.h"
 #include <optional>
 #include <pqxx/pqxx>

@@ -34,7 +34,6 @@ public:
 
   class SearchInput {
   public:
-    std::string_view auth_token;
     GeoCoordinates geo;
     std::string_view query;
   };
@@ -57,7 +56,6 @@ public:
 
   class FindInput {
   public:
-    std::string_view auth_token;
     int venue_id;
     int party_size;
     Date day;

@@ -1,4 +1,4 @@
-#include "src/reserver/proxies/resy/resy_user.h"
+#include "src/reserver/proxies/resy/models/resy_user.h"
 #include "src/reserver/reserver_models/user.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
