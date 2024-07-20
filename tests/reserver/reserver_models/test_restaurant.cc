@@ -162,4 +162,6 @@ TEST_CASE("restaurant interacts with db correctly",
 
     assert_restaurant_list_in_db({});
   }
+
+  Restaurant::drop_table();
 }

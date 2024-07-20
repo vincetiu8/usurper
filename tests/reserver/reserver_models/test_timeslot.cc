@@ -1,6 +1,6 @@
+#include "src/reserver/reserver_models/restaurant.h"
 #include "src/reserver/reserver_models/timeslot.h"
 #include <catch2/catch_test_macros.hpp>
-#include <iostream>
 #include <optional>
 
 struct TimeslotAssertion {
@@ -41,6 +41,8 @@ void assert_timeslot_list_in_db(
 TEST_CASE("timeslot interacts with db correctly",
           "[reserver][reserver_models][timeslot]") {
   Timeslot::drop_table();
+  Restaurant::drop_table();
+  Restaurant::create_table();
   Timeslot::create_table();
 
   Date date1(2000, 1, 1);
@@ -51,9 +53,14 @@ TEST_CASE("timeslot interacts with db correctly",
   Time start_time2(13, 0);
   Time end_time2(14, 30);
 
+  Restaurant restaurant1{.name = "restaurant 1"};
+  restaurant1.save();
+  Restaurant restaurant2{.name = "restaurant 2"};
+  restaurant2.save();
+
   SECTION("stores and loads timeslot from db") {
     Timeslot timeslot{
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -64,7 +71,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
     TimeslotAssertion expected = {
         .id = timeslot.id,
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -81,7 +88,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
   SECTION("stores and loads multiple timeslots from db") {
     Timeslot timeslot1{
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -90,7 +97,7 @@ TEST_CASE("timeslot interacts with db correctly",
     };
     timeslot1.save();
     Timeslot timeslot2{
-        .restaurant_id = 2,
+        .restaurant_id = restaurant2.id,
         .date = date2,
         .start_time = start_time2,
         .end_time = end_time2,
@@ -101,14 +108,14 @@ TEST_CASE("timeslot interacts with db correctly",
 
     std::vector<TimeslotAssertion> expected = {
         {.id = timeslot1.id,
-         .restaurant_id = 1,
+         .restaurant_id = restaurant1.id,
          .date = date1,
          .start_time = start_time1,
          .end_time = end_time1,
          .party_size = 2,
          .available = true},
         {.id = timeslot2.id,
-         .restaurant_id = 2,
+         .restaurant_id = restaurant2.id,
          .date = date2,
          .start_time = start_time2,
          .end_time = end_time2,
@@ -121,7 +128,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
   SECTION("updates timeslot with same reference in db") {
     Timeslot timeslot{
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -135,7 +142,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
     TimeslotAssertion expected = {
         .id = timeslot.id,
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -148,7 +155,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
   SECTION("updates timeslot with different reference in db") {
     Timeslot timeslot{
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -165,7 +172,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
     TimeslotAssertion expected = {
         .id = timeslot.id,
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -178,7 +185,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
   SECTION("removes timeslot from db") {
     Timeslot timeslot{
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -193,7 +200,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
   SECTION("removes timeslot by id from db") {
     Timeslot timeslot{
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -208,7 +215,7 @@ TEST_CASE("timeslot interacts with db correctly",
 
   SECTION("removes all timeslots from db") {
     Timeslot timeslot1{
-        .restaurant_id = 1,
+        .restaurant_id = restaurant1.id,
         .date = date1,
         .start_time = start_time1,
         .end_time = end_time1,
@@ -217,7 +224,7 @@ TEST_CASE("timeslot interacts with db correctly",
     };
     timeslot1.save();
     Timeslot timeslot2{
-        .restaurant_id = 2,
+        .restaurant_id = restaurant2.id,
         .date = date2,
         .start_time = start_time2,
         .end_time = end_time2,
@@ -229,4 +236,7 @@ TEST_CASE("timeslot interacts with db correctly",
     Timeslot::remove_all();
     assert_timeslot_list_in_db({});
   }
+
+  Timeslot::drop_table();
+  Restaurant::drop_table();
 }
