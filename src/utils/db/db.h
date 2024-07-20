@@ -1,3 +1,5 @@
 #include <pqxx/pqxx>
 
-pqxx::work get_transaction();
+pqxx::connection *get_db_connection();
+
+pqxx::work get_work();

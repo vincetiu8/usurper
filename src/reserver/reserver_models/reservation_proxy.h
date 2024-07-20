@@ -1,18 +1,21 @@
 #pragma once
 
-#include "models.h"
-#include <vector>
+// #include "src/reserver/reserver_models/user.h"
+// #include <vector>
 
-class ReservationProxy {
-public:
-  std::vector<Restaurant> filter_restaurants(std::string_view name,
-                                             Locality locality);
+// class ReservationProxy {
+// public:
+//   virtual void login(User user, std::string_view email,
+//                      std::string_view password);
 
-  std::vector<Timeslot> get_timeslots(Restaurant restaurant);
+//   virtual std::vector<Restaurant> query_restaurants(std::string_view name,
+//                                                     Locality locality);
 
-  int book_timeslot(Timeslot timeslot);
+//   virtual std::vector<Timeslot> get_restaurant_timeslots(Restaurant
+//   restaurant,
+//                                                          Date date);
 
-  int cancel_booking(Booking booking);
+//   virtual int book_timeslot(Timeslot timeslot);
 
-  int login(User user, std::string_view email, std::string_view password);
-};
+//   virtual int cancel_booking(Booking booking);
+// };

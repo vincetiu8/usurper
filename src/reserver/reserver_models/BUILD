@@ -2,10 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "reserver_models",
-    hdrs = ["models.h", "reservation_proxy.h"],
+    srcs = glob(["*.cc"]),
+    hdrs = glob(["*.h"]),
     deps = [
       "//src/utils/geo",
       "//src/utils/time",
+      "//src/utils/db",
+      "@libpqxx//:libpqxx",
     ],
-    visibility = ["//src/reserver:__subpackages__"],
+    visibility = ["//src/reserver:__subpackages__", "//tests:__subpackages__"],
 )

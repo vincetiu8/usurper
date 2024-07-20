@@ -2,8 +2,8 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
   name = "proxies",
-  srcs = ["proxy.cc", "http_clients.cc", "resy.cc"],
-  hdrs = ["proxy.h", "http_clients.h", "resy.h"],
+  srcs = glob(["*.cc"]),
+  hdrs = glob(["*.h"]),
   deps = [
     "//src/reserver/proxies/resy",
     "//src/utils/cli",
