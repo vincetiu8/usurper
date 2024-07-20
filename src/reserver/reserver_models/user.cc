@@ -58,19 +58,19 @@ std::optional<User> User::get(int id) {
 
   auto [name] = r.value();
 
-  return User(id, name);
+  return User{.id = id, .name = name};
 }
 
 std::vector<User> User::get_all() {
   pqxx::work tx = get_work();
 
-  std::string query = "SELECT id, name FROM users";
+  std::string query = "SELECT id, name FROM users ORDER BY id";
   auto r = tx.query<int, std::string>(query);
 
   std::vector<User> users;
   for (auto row : r) {
     auto [id, name] = row;
-    users.push_back(User(id, name));
+    users.push_back(User{.id = id, .name = name});
   }
 
   return users;
@@ -119,22 +119,13 @@ void User::save() {
 }
 
 void User::refresh() {
-  if (id == 0) {
-    throw std::runtime_error("UserModel::refresh: id is 0");
+  std::optional<User> user = User::get(id);
+
+  if (user.has_value()) {
+    *this = user.value();
+  } else {
+    throw std::runtime_error("User does not exist");
   }
-
-  pqxx::work tx = get_work();
-
-  pqxx::params params{};
-  pqxx::placeholders placeholders{};
-  std::string query = "SELECT name FROM users WHERE id = " + placeholders.get();
-  params.append(id);
-
-  auto r = tx.query1<std::string>(query, params);
-
-  this->name = std::get<0>(r);
-
-  tx.commit();
 }
 
 void User::remove() { remove(id); }

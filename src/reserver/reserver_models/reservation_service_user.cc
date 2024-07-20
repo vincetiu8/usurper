@@ -1,5 +1,4 @@
 #include "src/reserver/reserver_models/reservation_service_user.h"
-#include "src/reserver/reserver_models/models.h"
 #include "src/reserver/reserver_models/reservation_service_code.h"
 #include "src/utils/db/db.h"
 #include <optional>
@@ -25,10 +24,10 @@ void ReservationServiceUser::create_table() {
   }
 
   query = "CREATE TABLE IF NOT EXISTS reservation_service_users ("
-          " reservation_service_code TEXT NOT NULL,"
           " user_id INT NOT NULL,"
+          " reservation_service_code TEXT NOT NULL,"
           " auth_token TEXT NOT NULL,"
-          " PRIMARY KEY (reservation_service_code, user_id),"
+          " PRIMARY KEY (user_id, reservation_service_code),"
           " FOREIGN KEY (user_id) REFERENCES users(id)"
           ")";
 
@@ -53,12 +52,12 @@ ReservationServiceUser::get(ReservationServiceCode rsc, int user_id) {
   pqxx::params params{};
   pqxx::placeholders placeholders{};
   std::string query = "SELECT auth_token FROM reservation_service_users"
-                      " WHERE reservation_service_code = " +
+                      " WHERE user_id = " +
                       placeholders.get();
-  params.append(reservation_service_code_to_string(rsc));
-  placeholders.next();
-  query += " AND user_id = " + placeholders.get();
   params.append(user_id);
+  placeholders.next();
+  query += " AND reservation_service_code = " + placeholders.get();
+  params.append(reservation_service_code_to_string(rsc));
 
   auto r = tx.query01<std::string>(query, params);
 
@@ -68,7 +67,9 @@ ReservationServiceUser::get(ReservationServiceCode rsc, int user_id) {
 
   auto [auth_token] = r.value();
 
-  return ReservationServiceUser(rsc, user_id, auth_token);
+  return ReservationServiceUser{.user_id = user_id,
+                                .reservation_service_code = rsc,
+                                .auth_token = auth_token};
 }
 
 std::vector<ReservationServiceUser> ReservationServiceUser::get_all() {
@@ -76,18 +77,21 @@ std::vector<ReservationServiceUser> ReservationServiceUser::get_all() {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query = "SELECT reservation_service_code, user_id, auth_token "
-                      "FROM reservation_service_users";
+  std::string query = "SELECT user_id, reservation_service_code, auth_token "
+                      "FROM reservation_service_users ORDER BY user_id";
 
-  auto r = tx.query<std::string, int, std::string>(query, params);
+  auto r = tx.query<int, std::string, std::string>(query, params);
 
   std::vector<ReservationServiceUser> reservation_service_users{};
   for (auto row : r) {
-    auto [reservation_service_code_string, user_id, auth_token] = row;
+    auto [user_id, reservation_service_code_string, auth_token] = row;
     ReservationServiceCode rsc =
         string_to_reservation_service_code(reservation_service_code_string);
-    reservation_service_users.push_back(
-        ReservationServiceUser(rsc, user_id, auth_token));
+    reservation_service_users.push_back(ReservationServiceUser{
+        .user_id = user_id,
+        .reservation_service_code = rsc,
+        .auth_token = auth_token,
+    });
   }
 
   return reservation_service_users;
@@ -98,14 +102,13 @@ void ReservationServiceUser::create() {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query =
-      "INSERT INTO reservation_service_users (reservation_service_code, "
-      "user_id, auth_token) VALUES (" +
-      placeholders.get() + ", ";
-  params.append(reservation_service_code_to_string(reservation_service_code));
+  std::string query = "INSERT INTO reservation_service_users (user_id, "
+                      "reservation_service_code, auth_token) VALUES (" +
+                      placeholders.get() + ", ";
+  params.append(user_id);
   placeholders.next();
   query += placeholders.get() + ", ";
-  params.append(user_id);
+  params.append(reservation_service_code_to_string(reservation_service_code));
   placeholders.next();
   query += placeholders.get() + ")";
   params.append(auth_token);
@@ -124,12 +127,13 @@ void ReservationServiceUser::update() {
       "UPDATE reservation_service_users SET auth_token = " + placeholders.get();
   params.append(auth_token);
   placeholders.next();
-  query += " WHERE reservation_service_code = " + placeholders.get();
-  params.append(reservation_service_code_to_string(reservation_service_code));
-  placeholders.next();
-  query += " AND user_id = " + placeholders.get();
-  params.append(user_id);
+  query += " WHERE user_id = " + placeholders.get();
 
+  params.append(user_id);
+  placeholders.next();
+  query += " AND reservation_service_code = " + placeholders.get();
+
+  params.append(reservation_service_code_to_string(reservation_service_code));
   tx.exec_params(query, params);
 
   tx.commit();
@@ -147,27 +151,14 @@ void ReservationServiceUser::save() {
 }
 
 void ReservationServiceUser::refresh() {
-  if (user_id == 0) {
-    throw std::runtime_error(
-        "ReservationServiceUserModel::refresh: user_id is 0");
+  std::optional<ReservationServiceUser> rsu =
+      ReservationServiceUser::get(reservation_service_code, user_id);
+
+  if (rsu.has_value()) {
+    *this = rsu.value();
+  } else {
+    throw std::runtime_error("ReservationServiceUser not found");
   }
-
-  pqxx::work tx = get_work();
-
-  pqxx::params params{};
-  pqxx::placeholders placeholders{};
-
-  std::string query = "SELECT auth_token FROM reservation_service_users"
-                      " WHERE reservation_service_code = " +
-                      placeholders.get();
-  params.append(reservation_service_code_to_string(reservation_service_code));
-  placeholders.next();
-  query += " WHERE user_id = " + placeholders.get();
-  params.append(user_id);
-
-  auto r = tx.query1<std::string>(query, params);
-
-  this->auth_token = std::get<0>(r);
 }
 
 void ReservationServiceUser::remove() {
@@ -180,13 +171,14 @@ void ReservationServiceUser::remove(ReservationServiceCode rsc, int user_id) {
   pqxx::params params{};
   pqxx::placeholders placeholders{};
   std::string query = "DELETE FROM reservation_service_users WHERE "
-                      "reservation_service_code = " +
+                      "user_id = " +
                       placeholders.get();
-  params.append(reservation_service_code_to_string(rsc));
-  placeholders.next();
-  query += " AND user_id = " + placeholders.get();
-  params.append(user_id);
 
+  params.append(user_id);
+  placeholders.next();
+  query += " AND reservation_service_code = " + placeholders.get();
+
+  params.append(reservation_service_code_to_string(rsc));
   tx.exec_params(query, params);
 
   tx.commit();

@@ -1,6 +1,5 @@
 #include "src/reserver/reserver_models/reservation_service_user.h"
 #include "src/reserver/reserver_models/user.h"
-#include "src/utils/db/db.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
@@ -18,8 +17,9 @@ TEST_CASE("reservation service user connects to db correctly",
 
   SECTION("stores and loads reservation service user from db") {
     ReservationServiceUser rsu{
-        .reservation_service_code = ReservationServiceCode::resy,
         .user_id = user1.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+
         .auth_token = "auth token 1",
     };
     rsu.save();
@@ -42,14 +42,16 @@ TEST_CASE("reservation service user connects to db correctly",
 
   SECTION("stores and loads multiple reservation service users from db") {
     ReservationServiceUser rsu1{
-        .reservation_service_code = ReservationServiceCode::resy,
         .user_id = user1.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+
         .auth_token = "auth token 1",
     };
     rsu1.save();
-    ReservationServiceUser rsu2{.reservation_service_code =
+    ReservationServiceUser rsu2{.user_id = user2.id,
+                                .reservation_service_code =
                                     ReservationServiceCode::resy,
-                                .user_id = user2.id,
+
                                 .auth_token = "auth token 2"};
     rsu2.save();
 
@@ -62,8 +64,9 @@ TEST_CASE("reservation service user connects to db correctly",
 
   SECTION("updates reservation service user with same reference in db") {
     ReservationServiceUser rsu{
-        .reservation_service_code = ReservationServiceCode::resy,
         .user_id = user1.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+
         .auth_token = "auth token 1",
     };
     rsu.save();
@@ -80,9 +83,10 @@ TEST_CASE("reservation service user connects to db correctly",
   }
 
   SECTION("updates reservation service user with different reference in db") {
-    ReservationServiceUser rsu{.reservation_service_code =
+    ReservationServiceUser rsu{.user_id = user1.id,
+                               .reservation_service_code =
                                    ReservationServiceCode::resy,
-                               .user_id = user1.id,
+
                                .auth_token = "auth token 1"};
     rsu.save();
 
@@ -99,12 +103,17 @@ TEST_CASE("reservation service user connects to db correctly",
     REQUIRE(rsus[0].reservation_service_code == ReservationServiceCode::resy);
     REQUIRE(rsus[0].user_id == rsu.user_id);
     REQUIRE(rsus[0].auth_token == "auth token 2");
+
+    rsu.refresh();
+
+    REQUIRE(rsu.auth_token == "auth token 2");
   }
 
   SECTION("removes reservation service user from db") {
     ReservationServiceUser rsu{
-        .reservation_service_code = ReservationServiceCode::resy,
         .user_id = user1.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+
         .auth_token = "auth token 1",
     };
     rsu.save();
@@ -120,13 +129,17 @@ TEST_CASE("reservation service user connects to db correctly",
 
   SECTION("removes reservation service user by reservation service code and "
           "user_id from db") {
-    ReservationServiceUser rsu1{.reservation_service_code =
+    ReservationServiceUser rsu1{.user_id = user1.id,
+                                .reservation_service_code =
                                     ReservationServiceCode::resy,
-                                .user_id = user1.id,
+
                                 .auth_token = "auth token 1"};
     rsu1.save();
-    ReservationServiceUser rsu2(ReservationServiceCode::resy, user2.id,
-                                "auth token 2");
+    ReservationServiceUser rsu2{
+        .user_id = user2.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+        .auth_token = "auth token 2",
+    };
     rsu2.save();
 
     std::vector<ReservationServiceUser> rsus =
@@ -141,14 +154,16 @@ TEST_CASE("reservation service user connects to db correctly",
   }
 
   SECTION("removes reservation service user by user_id from db") {
-    ReservationServiceUser rsu1{.reservation_service_code =
+    ReservationServiceUser rsu1{.user_id = user1.id,
+                                .reservation_service_code =
                                     ReservationServiceCode::resy,
-                                .user_id = user1.id,
+
                                 .auth_token = "auth token 1"};
     rsu1.save();
-    ReservationServiceUser rsu2{.reservation_service_code =
+    ReservationServiceUser rsu2{.user_id = user2.id,
+                                .reservation_service_code =
                                     ReservationServiceCode::resy,
-                                .user_id = user2.id,
+
                                 .auth_token = "auth token 2"};
     rsu2.save();
 
@@ -162,15 +177,16 @@ TEST_CASE("reservation service user connects to db correctly",
   }
 
   SECTION("removes all reservation service users from db") {
-    ReservationServiceUser rsu1{.reservation_service_code =
+    ReservationServiceUser rsu1{.user_id = user1.id,
+                                .reservation_service_code =
                                     ReservationServiceCode::resy,
-                                .user_id = user1.id,
                                 .auth_token = "auth token 1"};
     rsu1.save();
-    ReservationServiceUser rsu2{.reservation_service_code =
-                                    ReservationServiceCode::resy,
-                                .user_id = user2.id,
-                                .auth_token = "auth token 2"};
+    ReservationServiceUser rsu2{
+
+        .user_id = user2.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+        .auth_token = "auth token 2"};
     rsu2.save();
 
     std::vector<ReservationServiceUser> rsus =

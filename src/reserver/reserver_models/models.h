@@ -5,17 +5,6 @@
 #include <string>
 
 /**
- * represents a unique restaurant
- */
-class Restaurant {
-public:
-  // primary key
-  int id;
-
-  ReservationServiceCode reservation_service_code;
-};
-
-/**
  * represents a unique timeslot at a restaurant
  */
 class Timeslot {

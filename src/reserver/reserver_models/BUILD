@@ -9,6 +9,7 @@ cc_library(
       "//src/utils/time",
       "//src/utils/db",
       "@libpqxx//:libpqxx",
+      "//src/utils/string",
     ],
     visibility = ["//src/reserver:__subpackages__", "//tests:__subpackages__"],
 )
