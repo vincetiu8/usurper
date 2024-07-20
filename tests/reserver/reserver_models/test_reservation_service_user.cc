@@ -3,7 +3,36 @@
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
-TEST_CASE("reservation service user connects to db correctly",
+struct ReservationServiceUserAssertion {
+  int user_id;
+  ReservationServiceCode reservation_service_code;
+  std::string auth_token;
+};
+
+void assert_reservation_service_user(
+    const ReservationServiceUser &rsu,
+    const ReservationServiceUserAssertion &assertion) {
+  REQUIRE(rsu.user_id == assertion.user_id);
+  REQUIRE(rsu.reservation_service_code == assertion.reservation_service_code);
+  REQUIRE(rsu.auth_token == assertion.auth_token);
+}
+
+void assert_reservation_service_user_list(
+    const std::vector<ReservationServiceUser> &rsus,
+    const std::vector<ReservationServiceUserAssertion> &assertions) {
+  REQUIRE(rsus.size() == assertions.size());
+  for (size_t i = 0; i < rsus.size(); i++) {
+    assert_reservation_service_user(rsus[i], assertions[i]);
+  }
+}
+
+void assert_reservation_service_user_list_in_db(
+    const std::vector<ReservationServiceUserAssertion> &assertions) {
+  std::vector<ReservationServiceUser> rsus = ReservationServiceUser::get_all();
+  assert_reservation_service_user_list(rsus, assertions);
+}
+
+TEST_CASE("reservation service user interacts with db correctly",
           "[reserver][reserver_models][reservation_service_user]") {
   ReservationServiceUser::drop_table();
   User::drop_table();
@@ -24,20 +53,18 @@ TEST_CASE("reservation service user connects to db correctly",
     };
     rsu.save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 1);
-    REQUIRE(rsus[0].reservation_service_code == ReservationServiceCode::resy);
-    REQUIRE(rsus[0].user_id == user1.id);
-    REQUIRE(rsus[0].auth_token == "auth token 1");
+    ReservationServiceUserAssertion expected = {
+        .user_id = user1.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+        .auth_token = "auth token 1",
+    };
+
+    assert_reservation_service_user_list_in_db({expected});
 
     std::optional<ReservationServiceUser> other =
         ReservationServiceUser::get(ReservationServiceCode::resy, user1.id);
     REQUIRE(other.has_value());
-    REQUIRE(other.value().reservation_service_code ==
-            ReservationServiceCode::resy);
-    REQUIRE(other.value().user_id == user1.id);
-    REQUIRE(other.value().auth_token == "auth token 1");
+    assert_reservation_service_user(other.value(), expected);
   }
 
   SECTION("stores and loads multiple reservation service users from db") {
@@ -55,11 +82,16 @@ TEST_CASE("reservation service user connects to db correctly",
                                 .auth_token = "auth token 2"};
     rsu2.save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 2);
-    REQUIRE(rsus[0].auth_token == "auth token 1");
-    REQUIRE(rsus[1].auth_token == "auth token 2");
+    std::vector<ReservationServiceUserAssertion> expected = {
+        {.user_id = user1.id,
+         .reservation_service_code = ReservationServiceCode::resy,
+         .auth_token = "auth token 1"},
+        {.user_id = user2.id,
+         .reservation_service_code = ReservationServiceCode::resy,
+         .auth_token = "auth token 2"},
+    };
+
+    assert_reservation_service_user_list_in_db(expected);
   }
 
   SECTION("updates reservation service user with same reference in db") {
@@ -74,12 +106,13 @@ TEST_CASE("reservation service user connects to db correctly",
     rsu.auth_token = "auth token 2";
     rsu.save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 1);
-    REQUIRE(rsus[0].reservation_service_code == ReservationServiceCode::resy);
-    REQUIRE(rsus[0].user_id == rsu.user_id);
-    REQUIRE(rsus[0].auth_token == "auth token 2");
+    ReservationServiceUserAssertion expected = {
+        .user_id = user1.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+        .auth_token = "auth token 2",
+    };
+
+    assert_reservation_service_user_list_in_db({expected});
   }
 
   SECTION("updates reservation service user with different reference in db") {
@@ -97,16 +130,17 @@ TEST_CASE("reservation service user connects to db correctly",
     other.value().auth_token = "auth token 2";
     other.value().save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 1);
-    REQUIRE(rsus[0].reservation_service_code == ReservationServiceCode::resy);
-    REQUIRE(rsus[0].user_id == rsu.user_id);
-    REQUIRE(rsus[0].auth_token == "auth token 2");
+    ReservationServiceUserAssertion expected = {
+        .user_id = user1.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+        .auth_token = "auth token 2",
+    };
+
+    assert_reservation_service_user_list_in_db({expected});
 
     rsu.refresh();
 
-    REQUIRE(rsu.auth_token == "auth token 2");
+    assert_reservation_service_user(rsu, expected);
   }
 
   SECTION("removes reservation service user from db") {
@@ -118,13 +152,9 @@ TEST_CASE("reservation service user connects to db correctly",
     };
     rsu.save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 1);
-
     rsu.remove();
-    rsus = ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 0);
+
+    assert_reservation_service_user_list_in_db({});
   }
 
   SECTION("removes reservation service user by reservation service code and "
@@ -142,15 +172,15 @@ TEST_CASE("reservation service user connects to db correctly",
     };
     rsu2.save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 2);
-
     ReservationServiceUser::remove(ReservationServiceCode::resy, user1.id);
-    rsus = ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 1);
-    REQUIRE(rsus[0].reservation_service_code == ReservationServiceCode::resy);
-    REQUIRE(rsus[0].user_id == user2.id);
+
+    ReservationServiceUserAssertion expected = {
+        .user_id = user2.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+        .auth_token = "auth token 2",
+    };
+
+    assert_reservation_service_user_list_in_db({expected});
   }
 
   SECTION("removes reservation service user by user_id from db") {
@@ -167,13 +197,15 @@ TEST_CASE("reservation service user connects to db correctly",
                                 .auth_token = "auth token 2"};
     rsu2.save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 2);
-
     ReservationServiceUser::remove_by_user_id(user1.id);
-    rsus = ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 1);
+
+    ReservationServiceUserAssertion expected = {
+        .user_id = user2.id,
+        .reservation_service_code = ReservationServiceCode::resy,
+        .auth_token = "auth token 2",
+    };
+
+    assert_reservation_service_user_list_in_db({expected});
   }
 
   SECTION("removes all reservation service users from db") {
@@ -189,13 +221,9 @@ TEST_CASE("reservation service user connects to db correctly",
         .auth_token = "auth token 2"};
     rsu2.save();
 
-    std::vector<ReservationServiceUser> rsus =
-        ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 2);
-
     ReservationServiceUser::remove_all();
-    rsus = ReservationServiceUser::get_all();
-    REQUIRE(rsus.size() == 0);
+
+    assert_reservation_service_user_list_in_db({});
   }
 
   ReservationServiceUser::drop_table();

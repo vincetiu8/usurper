@@ -2,6 +2,7 @@
 
 #include "src/reserver/reserver_models/reservation_service_code.h"
 #include <string>
+#include <vector>
 
 /**
  * represents a user account with a reservation service

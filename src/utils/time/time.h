@@ -7,10 +7,6 @@ namespace chrono = std::chrono;
 
 class Date {
 public:
-  Date(int year, int month, int date, int day);
-
-  Date(const std::string &date_str, const std::string &format);
-
   // year
   int year;
 
@@ -21,22 +17,34 @@ public:
   // date of the month
   int date;
 
-  // day of the week
-  // begins on monday
-  int day;
+  Date(int year, int month, int date);
 
-  std::string to_yyyy_mm_dd_string();
+  Date(const std::string &date_str, const std::string &format);
+
+  std::string to_yyyy_mm_dd_string() const;
+
+  std::string to_yy_mm_dd_string() const;
+
+  bool operator==(const Date &rhs) const;
+
+  bool operator!=(const Date &rhs) const;
 };
 
 class Time {
 public:
-  Time(int hour, int minute);
-
-  Time(const std::string &time_str, const std::string &format);
-
   int hour;
 
   int minute;
 
-  std::string to_hh_mm_string();
+  Time(int hour, int minute);
+
+  Time(const std::string &time_str, const std::string &format);
+
+  std::string to_hh_mm_string() const;
+
+  std::string to_hh_mm_ss_string() const;
+
+  bool operator==(const Time &rhs) const;
+
+  bool operator!=(const Time &rhs) const;
 };

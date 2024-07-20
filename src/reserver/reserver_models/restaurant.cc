@@ -1,6 +1,7 @@
 #include "src/reserver/reserver_models/restaurant.h"
 #include "src/utils/db/db.h"
 #include "src/utils/string/string.h"
+#include <optional>
 #include <pqxx/pqxx>
 
 void Restaurant::create_table() {

@@ -2,7 +2,33 @@
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
-TEST_CASE("restaurant connects to db correctly",
+struct RestaurantAssertion {
+  int id;
+  std::string name;
+};
+
+void assert_restaurant(const Restaurant &restaurant,
+                       const RestaurantAssertion &assertion) {
+  REQUIRE(restaurant.id == assertion.id);
+  REQUIRE(restaurant.name == assertion.name);
+}
+
+void assert_restaurant_list(
+    const std::vector<Restaurant> &restaurants,
+    const std::vector<RestaurantAssertion> &assertions) {
+  REQUIRE(restaurants.size() == assertions.size());
+  for (size_t i = 0; i < restaurants.size(); i++) {
+    assert_restaurant(restaurants[i], assertions[i]);
+  }
+}
+
+void assert_restaurant_list_in_db(
+    const std::vector<RestaurantAssertion> &assertions) {
+  std::vector<Restaurant> restaurants = Restaurant::get_all();
+  assert_restaurant_list(restaurants, assertions);
+}
+
+TEST_CASE("restaurant interacts with db correctly",
           "[reserver][reserver_models][restaurant]") {
   Restaurant::drop_table();
   Restaurant::create_table();
@@ -11,13 +37,14 @@ TEST_CASE("restaurant connects to db correctly",
     Restaurant restaurant{.name = "restaurant 1"};
     restaurant.save();
 
-    std::vector<Restaurant> restaurants = Restaurant::get_all();
-    REQUIRE(restaurants.size() == 1);
-    REQUIRE(restaurants[0].name == "restaurant 1");
+    RestaurantAssertion expected = {
+        .id = restaurant.id,
+        .name = "restaurant 1",
+    };
 
-    std::optional<Restaurant> other = Restaurant::get(restaurants[0].id);
+    std::optional<Restaurant> other = Restaurant::get(restaurant.id);
     REQUIRE(other.has_value());
-    REQUIRE(other.value().name == "restaurant 1");
+    assert_restaurant(other.value(), expected);
   }
 
   SECTION("stores and loads multiple restaurants from db") {
@@ -26,10 +53,12 @@ TEST_CASE("restaurant connects to db correctly",
     Restaurant restaurant2{.name = "restaurant 2"};
     restaurant2.save();
 
-    std::vector<Restaurant> restaurants = Restaurant::get_all();
-    REQUIRE(restaurants.size() == 2);
-    REQUIRE(restaurants[0].name == "restaurant 1");
-    REQUIRE(restaurants[1].name == "restaurant 2");
+    std::vector<RestaurantAssertion> expected = {
+        {.id = restaurant1.id, .name = "restaurant 1"},
+        {.id = restaurant2.id, .name = "restaurant 2"},
+    };
+
+    assert_restaurant_list_in_db(expected);
   }
 
   SECTION("gets restaurants by name from db") {
@@ -38,32 +67,34 @@ TEST_CASE("restaurant connects to db correctly",
     Restaurant restaurant2{.name = "restaurant 2"};
     restaurant2.save();
 
+    RestaurantAssertion expected1 = {
+        .id = restaurant1.id,
+        .name = "restaurant 1",
+    };
+    RestaurantAssertion expected2 = {
+        .id = restaurant2.id,
+        .name = "restaurant 2",
+    };
+
     std::string name = "restaurant 1";
     std::vector<Restaurant> restaurants = Restaurant::get_by_name(name);
-    REQUIRE(restaurants.size() == 1);
-    REQUIRE(restaurants[0].name == "restaurant 1");
+    assert_restaurant_list(restaurants, {expected1});
 
     name = "restaurant";
     restaurants = Restaurant::get_by_name(name);
-    REQUIRE(restaurants.size() == 2);
-    REQUIRE(restaurants[0].name == "restaurant 1");
-    REQUIRE(restaurants[1].name == "restaurant 2");
+    assert_restaurant_list(restaurants, {expected1, expected2});
 
     name = "res";
     restaurants = Restaurant::get_by_name(name);
-    REQUIRE(restaurants.size() == 2);
-    REQUIRE(restaurants[0].name == "restaurant 1");
-    REQUIRE(restaurants[1].name == "restaurant 2");
+    assert_restaurant_list(restaurants, {expected1, expected2});
 
     name = "rant";
     restaurants = Restaurant::get_by_name(name);
-    REQUIRE(restaurants.size() == 2);
-    REQUIRE(restaurants[0].name == "restaurant 1");
-    REQUIRE(restaurants[1].name == "restaurant 2");
+    assert_restaurant_list(restaurants, {expected1, expected2});
 
     name = "restaurant 3";
     restaurants = Restaurant::get_by_name(name);
-    REQUIRE(restaurants.size() == 0);
+    assert_restaurant_list(restaurants, {});
   }
 
   SECTION("updates restaurant with same reference in db") {
@@ -73,10 +104,12 @@ TEST_CASE("restaurant connects to db correctly",
     restaurant.name = "restaurant 2";
     restaurant.save();
 
-    std::vector<Restaurant> restaurants = Restaurant::get_all();
-    REQUIRE(restaurants.size() == 1);
-    REQUIRE(restaurants[0].id == restaurant.id);
-    REQUIRE(restaurants[0].name == "restaurant 2");
+    RestaurantAssertion expected = {
+        .id = restaurant.id,
+        .name = "restaurant 2",
+    };
+
+    assert_restaurant_list_in_db({expected});
   }
 
   SECTION("updates restaurant with different reference in db") {
@@ -89,24 +122,34 @@ TEST_CASE("restaurant connects to db correctly",
     other.value().name = "restaurant 2";
     other.value().save();
 
-    std::vector<Restaurant> restaurants = Restaurant::get_all();
-    REQUIRE(restaurants.size() == 1);
-    REQUIRE(restaurants[0].id == restaurant.id);
-    REQUIRE(restaurants[0].name == "restaurant 2");
+    RestaurantAssertion expected = {
+        .id = restaurant.id,
+        .name = "restaurant 2",
+    };
+
+    assert_restaurant_list_in_db({expected});
 
     restaurant.refresh();
 
-    REQUIRE(restaurant.name == "restaurant 2");
+    assert_restaurant(restaurant, expected);
   }
 
   SECTION("removes restaurant from db") {
     Restaurant restaurant{.name = "restaurant 1"};
     restaurant.save();
 
+    restaurant.remove();
+
+    assert_restaurant_list_in_db({});
+  }
+
+  SECTION("removes restaurant by id from db") {
+    Restaurant restaurant{.name = "restaurant 1"};
+    restaurant.save();
+
     Restaurant::remove(restaurant.id);
 
-    std::vector<Restaurant> restaurants = Restaurant::get_all();
-    REQUIRE(restaurants.size() == 0);
+    assert_restaurant_list_in_db({});
   }
 
   SECTION("removes all restaurants from db") {
@@ -117,7 +160,6 @@ TEST_CASE("restaurant connects to db correctly",
 
     Restaurant::remove_all();
 
-    std::vector<Restaurant> restaurants = Restaurant::get_all();
-    REQUIRE(restaurants.size() == 0);
+    assert_restaurant_list_in_db({});
   }
 }
