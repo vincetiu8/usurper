@@ -1,16 +1,16 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
-    name = "resy",
+    name = "models",
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
-      "//src/utils/http_clients",
       "//src/reserver/reserver_models",
-      "//src/reserver/proxies/resy/models",
       "//src/utils/config",
+      "//src/utils/db",
       "//src/utils/geo",
       "//src/utils/time",
+      "@libpqxx//:libpqxx",
     ],
-    visibility = ["//src/reserver:__pkg__", "//src/cli/proxies:__pkg__", "//tests:__subpackages__"],
+    visibility = ["//src/reserver/proxies/resy:__pkg__", "//tests:__subpackages__"],
 )

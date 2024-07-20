@@ -38,12 +38,7 @@ ResyApi::SearchOutput ResyApi::search(SearchInput input) {
       {"query", input.query},
   };
 
-  headers_t headers = {
-      {"X-Resy-Auth-Token", std::string(input.auth_token)},
-      {"X-Resy-Universal-Auth", std::string(input.auth_token)},
-  };
-
-  json::value data = http_client.post_json(target, content, headers);
+  json::value data = http_client.post_json(target, content, {});
 
   const json::object &data_obj = data.as_object();
   const json::array &hits_arr = data_obj.at("search").at("hits").as_array();
@@ -70,11 +65,6 @@ ResyApi::FindOutput ResyApi::find(FindInput input) {
   target += std::to_string(input.party_size);
   target += "&venue_id=";
   target += std::to_string(input.venue_id);
-
-  headers_t headers = {
-      {"X-Resy-Auth-Token", std::string(input.auth_token)},
-      {"X-Resy-Universal-Auth", std::string(input.auth_token)},
-  };
 
   json::value data = http_client.get(target, {});
 
