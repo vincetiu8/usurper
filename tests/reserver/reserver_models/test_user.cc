@@ -2,7 +2,30 @@
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
-TEST_CASE("user connects to db correctly",
+struct UserAssertion {
+  int id;
+  std::string name;
+};
+
+void assert_user(const User &user, const UserAssertion &assertion) {
+  REQUIRE(user.id == assertion.id);
+  REQUIRE(user.name == assertion.name);
+}
+
+void assert_user_list(const std::vector<User> &users,
+                      const std::vector<UserAssertion> &assertions) {
+  REQUIRE(users.size() == assertions.size());
+  for (size_t i = 0; i < users.size(); i++) {
+    assert_user(users[i], assertions[i]);
+  }
+}
+
+void assert_user_list_in_db(const std::vector<UserAssertion> &assertions) {
+  std::vector<User> users = User::get_all();
+  assert_user_list(users, assertions);
+}
+
+TEST_CASE("user interacts with db correctly",
           "[reserver][reserver_models][user]") {
   User::drop_table();
   User::create_table();
@@ -11,15 +34,16 @@ TEST_CASE("user connects to db correctly",
     User user{.name = "user 1"};
     user.save();
 
-    std::vector<User> users = User::get_all();
-    REQUIRE(users.size() == 1);
-    REQUIRE(users[0].id == user.id);
-    REQUIRE(users[0].name == "user 1");
+    UserAssertion expected = {
+        .id = user.id,
+        .name = "user 1",
+    };
+
+    assert_user_list_in_db({expected});
 
     std::optional<User> other = User::get(user.id);
     REQUIRE(other.has_value());
-    REQUIRE(other.value().id == user.id);
-    REQUIRE(other.value().name == "user 1");
+    assert_user(other.value(), expected);
   }
 
   SECTION("stores and loads multiple users from db") {
@@ -28,10 +52,12 @@ TEST_CASE("user connects to db correctly",
     User user2{.name = "user 2"};
     user2.save();
 
-    std::vector<User> users = User::get_all();
-    REQUIRE(users.size() == 2);
-    REQUIRE(users[0].name == "user 1");
-    REQUIRE(users[1].name == "user 2");
+    std::vector<UserAssertion> expected = {
+        {.id = user1.id, .name = "user 1"},
+        {.id = user2.id, .name = "user 2"},
+    };
+
+    assert_user_list_in_db(expected);
   }
 
   SECTION("updates user with same reference in db") {
@@ -41,10 +67,12 @@ TEST_CASE("user connects to db correctly",
     user.name = "user 2";
     user.save();
 
-    std::vector<User> users = User::get_all();
-    REQUIRE(users.size() == 1);
-    REQUIRE(users[0].id == user.id);
-    REQUIRE(users[0].name == "user 2");
+    UserAssertion expected = {
+        .id = user.id,
+        .name = "user 2",
+    };
+
+    assert_user_list_in_db({expected});
   }
 
   SECTION("updates user with different reference in db") {
@@ -57,38 +85,32 @@ TEST_CASE("user connects to db correctly",
     other.value().name = "user 2";
     other.value().save();
 
-    std::vector<User> users = User::get_all();
-    REQUIRE(users.size() == 1);
-    REQUIRE(users[0].id == user.id);
-    REQUIRE(users[0].name == "user 2");
+    UserAssertion expected = {
+        .id = user.id,
+        .name = "user 2",
+    };
+
+    assert_user_list_in_db({expected});
 
     user.refresh();
 
-    REQUIRE(user.name == "user 2");
+    assert_user(user, expected);
   }
 
   SECTION("removes user from db") {
     User user{.name = "user 1"};
     user.save();
 
-    std::vector<User> users = User::get_all();
-    REQUIRE(users.size() == 1);
-
     user.remove();
-    users = User::get_all();
-    REQUIRE(users.size() == 0);
+    assert_user_list_in_db({});
   }
 
   SECTION("removes user by id from db") {
     User user{.name = "user 1"};
     user.save();
 
-    std::vector<User> users = User::get_all();
-    REQUIRE(users.size() == 1);
-
     User::remove(user.id);
-    users = User::get_all();
-    REQUIRE(users.size() == 0);
+    assert_user_list_in_db({});
   }
 
   SECTION("removes all users from db") {
@@ -97,12 +119,8 @@ TEST_CASE("user connects to db correctly",
     User user2{.name = "user 2"};
     user2.save();
 
-    std::vector<User> users = User::get_all();
-    REQUIRE(users.size() == 2);
-
     User::remove_all();
-    users = User::get_all();
-    REQUIRE(users.size() == 0);
+    assert_user_list_in_db({});
   }
 
   User::drop_table();

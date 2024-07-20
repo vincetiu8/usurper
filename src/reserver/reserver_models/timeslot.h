@@ -1,28 +1,38 @@
 #pragma once
 
+#include "src/utils/time/time.h"
 #include <optional>
-#include <string>
 #include <vector>
 
 /**
  * represents a unique restaurant
  */
-class Restaurant {
+class Timeslot {
 public:
   // primary key
   int id;
 
-  std::string name;
+  int restaurant_id;
+
+  Date date;
+
+  Time start_time;
+
+  Time end_time;
+
+  int party_size;
+
+  bool available;
 
   static void create_table();
 
   static void drop_table();
 
-  static std::optional<Restaurant> get(int id);
+  static std::optional<Timeslot> get(int id);
 
-  static std::vector<Restaurant> get_by_name(std::string &name);
+  static std::vector<Timeslot> get_by_restaurant_id(int restaurant_id);
 
-  static std::vector<Restaurant> get_all();
+  static std::vector<Timeslot> get_all();
 
   void create();
 
