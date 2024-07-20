@@ -2,10 +2,10 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "reserver",
-    srcs = ["reserver.cc"],
-    hdrs = ["reserver.h"],
+    srcs = glob(["*.cc"]),
+    hdrs = glob(["*.h"]),
     deps = [
         "//src/reserver/proxies/resy:resy",
     ],
-    visibility = ["//src:__pkg__"],
+    visibility = ["//src:__pkg__", "//tests:__subpackages__"],
 )

@@ -2,23 +2,23 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "http_clients",
-    srcs = ["http_client.cc", "http_string_client.cc", "http_json_client.cc"],
-    hdrs = ["http_client.h", "http_string_client.h", "http_json_client.h", "root_certificates.h"],
+    srcs = glob(["*.cc"]),
+    hdrs = glob(["*.h"]),
     deps = [
       "@boost//:beast",
       "@boost//:asio_ssl",
       "@boost//:json",
     ],
-    visibility = ["//src:__subpackages__"]
+    visibility = ["//src:__subpackages__", "//tests:__subpackages__"],
 )
 
-cc_binary(
-    name = "http_clients_main",
-    srcs = ["main.cc"],
-    deps = [
-        "@boost//:beast",
-        "@boost//:asio_ssl",
-        "@boost//:json",
-        ":http_clients",
-    ],
-)
+# cc_binary(
+#     name = "http_clients_main",
+#     srcs = ["main.cc"],
+#     deps = [
+#         "@boost//:beast",
+#         "@boost//:asio_ssl",
+#         "@boost//:json",
+#         ":http_clients",
+#     ],
+# )

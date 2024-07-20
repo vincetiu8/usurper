@@ -1,8 +1,9 @@
+#include "src/utils/db/db.h"
 #include "src/utils/config/config.h"
 #include <pqxx/pqxx>
 #include <string>
 
-pqxx::connection get_db_connection() {
+pqxx::connection setup_connection() {
   std::string conn_str = "postgresql://";
   conn_str += POSTGRES_USER;
   conn_str += ":";
@@ -15,6 +16,8 @@ pqxx::connection get_db_connection() {
   return pqxx::connection(conn_str);
 }
 
-pqxx::connection conn = get_db_connection();
+pqxx::connection conn = setup_connection();
 
-pqxx::work get_transaction() { return pqxx::work(conn); }
+pqxx::connection *get_db_connection() { return &conn; }
+
+pqxx::work get_work() { return pqxx::work(conn); }

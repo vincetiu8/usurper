@@ -1,72 +1,29 @@
 #pragma once
 
-#include "src/utils/geo/geo.h"
+#include "src/reserver/reserver_models/reservation_service_code.h"
 #include "src/utils/time/time.h"
 #include <string>
 
 /**
- * represents a unique user in the system
+ * represents a unique restaurant
  */
-class User {
+class Restaurant {
 public:
   // primary key
   int id;
 
-  std::string name;
+  ReservationServiceCode reservation_service_code;
 };
 
-class ReservationService {
-public:
-  // primary key
-  std::string code;
-
-  std::string name;
-};
-
-class ReservationServiceUser {
-public:
-  ReservationService reservation_service;
-
-  User user;
-
-  // JWT token
-  std::string token;
-};
-
-class Cuisine {
-public:
-  // primary key
-  std::string name;
-};
-
-class Restaurant {
-public:
-  // primary key
-  // int id;
-  std::string name;
-
-  std::string locality_name;
-
-  Locality locality;
-
-  std::string cuisine_name;
-
-  Cuisine cuisine;
-
-  std::string reservation_service_code;
-
-  // currently we only support one reservation service per restaurant
-  ReservationService reservation_service;
-};
-
+/**
+ * represents a unique timeslot at a restaurant
+ */
 class Timeslot {
 public:
   // primary key
   int id;
 
   int restaurant_id;
-
-  Restaurant restaurant;
 
   Date date;
 
@@ -77,11 +34,12 @@ public:
   bool available;
 };
 
+/**
+ * represents a user timeslot booking
+ */
 class Booking {
 public:
   int timeslot_id;
-  Timeslot timeslot;
 
   int user_id;
-  User user;
 };
