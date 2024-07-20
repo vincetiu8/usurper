@@ -7,7 +7,7 @@
 /**
  * represents a user account with a reservation service
  */
-class ReservationServiceUser {
+class ResyUser {
 public:
   int user_id;
 
@@ -20,10 +20,10 @@ public:
 
   static void drop_table();
 
-  static std::optional<ReservationServiceUser>
+  static std::optional<ResyUser>
   get(ReservationServiceCode reservation_service_code, int user_id);
 
-  static std::vector<ReservationServiceUser> get_all();
+  static std::vector<ResyUser> get_all();
 
   void create();
 

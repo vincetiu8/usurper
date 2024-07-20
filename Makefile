@@ -14,5 +14,5 @@ test: debug-test
 debug-test:
 	bazel test --local_test_jobs=1 --test_output=all -c dbg //tests/... 
 	
-copy-compile-commands:
+compile-commands:
 	bazel run @hedron_compile_commands//:refresh_all
