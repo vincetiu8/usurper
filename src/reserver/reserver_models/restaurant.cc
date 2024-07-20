@@ -7,22 +7,10 @@
 void Restaurant::create_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "SELECT EXISTS ("
-                      " SELECT FROM information_schema.tables"
-                      " WHERE table_name = 'restaurants'"
+  std::string query = "CREATE TABLE IF NOT EXISTS restaurants ("
+                      " id SERIAL PRIMARY KEY,"
+                      " name TEXT NOT NULL"
                       ")";
-
-  auto r = tx.query1<bool>(query);
-
-  if (std::get<0>(r)) {
-    tx.commit();
-    return;
-  }
-
-  query = "CREATE TABLE IF NOT EXISTS restaurants ("
-          " id SERIAL PRIMARY KEY,"
-          " name TEXT NOT NULL"
-          ")";
 
   tx.exec(query);
 

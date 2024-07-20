@@ -5,7 +5,7 @@
 #include <vector>
 
 /**
- * represents a unique restaurant
+ * represents a unique timeslot
  */
 class Timeslot {
 public:

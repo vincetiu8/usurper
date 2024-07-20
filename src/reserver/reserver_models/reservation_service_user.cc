@@ -7,29 +7,13 @@
 void ReservationServiceUser::create_table() {
   pqxx::work tx = get_work();
 
-  pqxx::params params{};
-  pqxx::placeholders placeholders{};
-  std::string query = "SELECT EXISTS ("
-                      " SELECT FROM information_schema.tables"
-                      " WHERE table_name = " +
-                      placeholders.get();
-  query += ")";
-  params.append("reservation_service_users");
-
-  auto r = tx.query1<bool>(query, params);
-
-  if (std::get<0>(r)) {
-    tx.commit();
-    return;
-  }
-
-  query = "CREATE TABLE IF NOT EXISTS reservation_service_users ("
-          " user_id INT NOT NULL,"
-          " reservation_service_code TEXT NOT NULL,"
-          " auth_token TEXT NOT NULL,"
-          " PRIMARY KEY (user_id, reservation_service_code),"
-          " FOREIGN KEY (user_id) REFERENCES users(id)"
-          ")";
+  std::string query = "CREATE TABLE IF NOT EXISTS reservation_service_users ("
+                      " user_id INT NOT NULL,"
+                      " reservation_service_code TEXT NOT NULL,"
+                      " auth_token TEXT NOT NULL,"
+                      " PRIMARY KEY (user_id, reservation_service_code),"
+                      " FOREIGN KEY (user_id) REFERENCES users(id)"
+                      ")";
 
   tx.exec(query);
 

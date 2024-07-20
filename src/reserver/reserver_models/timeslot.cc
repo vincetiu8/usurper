@@ -8,27 +8,16 @@
 void Timeslot::create_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "SELECT EXISTS ("
-                      " SELECT FROM information_schema.tables"
-                      " WHERE table_name = 'timeslots'"
+  std::string query = "CREATE TABLE IF NOT EXISTS timeslots ("
+                      " id SERIAL PRIMARY KEY,"
+                      " restaurant_id INT NOT NULL,"
+                      " date DATE NOT NULL,"
+                      " start_time TIME NOT NULL,"
+                      " end_time TIME NOT NULL,"
+                      " party_size INT NOT NULL,"
+                      " available BOOLEAN NOT NULL,"
+                      " FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)"
                       ")";
-
-  auto r = tx.query1<bool>(query);
-
-  if (std::get<0>(r)) {
-    tx.commit();
-    return;
-  }
-
-  query = "CREATE TABLE IF NOT EXISTS timeslots ("
-          " id SERIAL PRIMARY KEY,"
-          " restaurant_id INT NOT NULL,"
-          " date DATE NOT NULL,"
-          " start_time TIME NOT NULL,"
-          " end_time TIME NOT NULL,"
-          " party_size INT NOT NULL,"
-          " available BOOLEAN NOT NULL"
-          ")";
 
   tx.exec(query);
 
