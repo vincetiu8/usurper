@@ -1,12 +1,9 @@
-#pragma once
-
-#include <optional>
-#include <string>
+#include "src/reserver/reserver_models/reservation_service_code.h"
 
 /**
- * represents a unique user
+ * represents a unique restaurant
  */
-class User {
+class Restaurant {
 public:
   // primary key
   int id;
@@ -17,9 +14,11 @@ public:
 
   static void drop_table();
 
-  static std::optional<User> get(int id);
+  static std::optional<Restaurant> get(int id);
 
-  static std::vector<User> get_all();
+  static std::vector<Restaurant> get_by_name(std::string &name);
+
+  static std::vector<Restaurant> get_all();
 
   void create();
 

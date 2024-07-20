@@ -1,5 +1,4 @@
 #include "src/reserver/reserver_models/user.h"
-#include "src/utils/db/db.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 

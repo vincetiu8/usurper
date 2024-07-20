@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/reserver/reserver_models/models.h"
+#include "src/reserver/reserver_models/reservation_service_code.h"
 #include <string>
 
 /**
@@ -8,9 +8,9 @@
  */
 class ReservationServiceUser {
 public:
-  ReservationServiceCode reservation_service_code;
-
   int user_id;
+
+  ReservationServiceCode reservation_service_code;
 
   // JWT token
   std::string auth_token;
