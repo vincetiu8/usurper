@@ -1,5 +1,5 @@
-#include "src/reserver/reserver_models/restaurant.h"
-#include "src/reserver/reserver_models/timeslot.h"
+#include "src/reserver/models/restaurant.h"
+#include "src/reserver/models/timeslot.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
@@ -39,7 +39,7 @@ void assert_timeslot_list_in_db(
 }
 
 TEST_CASE("timeslot interacts with db correctly",
-          "[reserver][reserver_models][timeslot]") {
+          "[reserver][models][timeslot]") {
   Timeslot::drop_table();
   Restaurant::drop_table();
   Restaurant::create_table();

@@ -1,5 +1,5 @@
-#include "src/reserver/reserver_models/reservation_service_code.h"
-#include "src/reserver/reserver_models/restaurant.h"
+#include "src/reserver/models/reservation_service_code.h"
+#include "src/reserver/models/restaurant.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
@@ -32,7 +32,7 @@ void assert_restaurant_list_in_db(
 }
 
 TEST_CASE("restaurant interacts with db correctly",
-          "[reserver][reserver_models][restaurant]") {
+          "[reserver][models][restaurant]") {
   Restaurant::drop_table();
   Restaurant::create_table();
 

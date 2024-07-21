@@ -1,4 +1,4 @@
-#include "src/reserver/reserver_models/timeslot.h"
+#include "src/reserver/models/timeslot.h"
 #include "src/utils/db/db.h"
 #include <optional>
 #include <pqxx/pqxx>
@@ -21,7 +21,8 @@ void Timeslot::create_table() {
 
   tx.exec(query);
 
-  query = "CREATE INDEX IF NOT EXISTS idx_timeslots ON timeslots "
+  query = "CREATE UNIQUE INDEX IF NOT EXISTS idx_timeslots_rid_date_start ON "
+          "timeslots "
           "(restaurant_id, date, start_time)";
 
   tx.exec(query);
@@ -32,7 +33,7 @@ void Timeslot::create_table() {
 void Timeslot::drop_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "DROP INDEX IF EXISTS idx_timeslots";
+  std::string query = "DROP INDEX IF EXISTS idx_timeslots_rid_date_start";
 
   tx.exec(query);
 
@@ -67,6 +68,42 @@ std::optional<Timeslot> Timeslot::get(int id) {
                   .restaurant_id = restaurant_id,
                   .date = Date(date, "%Y-%m-%d"),
                   .start_time = Time(start_time, "%H:%M:%S"),
+                  .end_time = Time(end_time, "%H:%M:%S"),
+                  .party_size = party_size,
+                  .available = available};
+}
+
+std::optional<Timeslot>
+Timeslot::get_by_restaurant_id_date_start_time(int restaurant_id, Date date,
+                                               Time start_time) {
+  pqxx::work tx = get_work();
+
+  pqxx::params params{};
+  pqxx::placeholders placeholders{};
+  std::string query =
+      "SELECT id, end_time, party_size, available FROM timeslots"
+      " WHERE restaurant_id = " +
+      placeholders.get();
+  params.append(restaurant_id);
+  placeholders.next();
+  query += " AND date = " + placeholders.get();
+  params.append(date.to_yyyy_mm_dd_string());
+  placeholders.next();
+  query += " AND start_time = " + placeholders.get();
+  params.append(start_time.to_hh_mm_ss_string());
+
+  auto r = tx.query01<int, std::string, int, bool>(query, params);
+
+  if (!r.has_value()) {
+    return std::nullopt;
+  }
+
+  auto [id, end_time, party_size, available] = r.value();
+
+  return Timeslot{.id = id,
+                  .restaurant_id = restaurant_id,
+                  .date = date,
+                  .start_time = start_time,
                   .end_time = Time(end_time, "%H:%M:%S"),
                   .party_size = party_size,
                   .available = available};

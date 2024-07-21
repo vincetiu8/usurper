@@ -1,4 +1,4 @@
-#include "src/reserver/reserver_models/user.h"
+#include "src/reserver/models/user.h"
 #include "src/utils/db/db.h"
 #include <optional>
 #include <pqxx/pqxx>
@@ -9,7 +9,8 @@ void User::create_table() {
 
   std::string query = "CREATE TABLE IF NOT EXISTS users ("
                       " id SERIAL PRIMARY KEY,"
-                      " name TEXT NOT NULL"
+                      " name TEXT NOT NULL,"
+                      " resy_token TEXT"
                       ")";
 
   tx.exec(query);
@@ -31,30 +32,31 @@ std::optional<User> User::get(int id) {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query = "SELECT name FROM users WHERE id = " + placeholders.get();
+  std::string query =
+      "SELECT name, resy_token FROM users WHERE id = " + placeholders.get();
   params.append(id);
 
-  auto r = tx.query01<std::string>(query, params);
+  auto r = tx.query01<std::string, std::optional<std::string>>(query, params);
 
   if (!r.has_value()) {
     return std::nullopt;
   }
 
-  auto [name] = r.value();
+  auto [name, resy_token] = r.value();
 
-  return User{.id = id, .name = name};
+  return User{.id = id, .name = name, .resy_token = resy_token};
 }
 
 std::vector<User> User::get_all() {
   pqxx::work tx = get_work();
 
-  std::string query = "SELECT id, name FROM users ORDER BY id";
-  auto r = tx.query<int, std::string>(query);
+  std::string query = "SELECT id, name, resy_token FROM users ORDER BY id";
+  auto r = tx.query<int, std::string, std::optional<std::string>>(query);
 
   std::vector<User> users;
   for (auto row : r) {
-    auto [id, name] = row;
-    users.push_back(User{.id = id, .name = name});
+    auto [id, name, resy_token] = row;
+    users.push_back(User{.id = id, .name = name, .resy_token = resy_token});
   }
 
   return users;
@@ -65,9 +67,13 @@ void User::create() {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query = "INSERT INTO users (name) VALUES (" + placeholders.get() +
-                      ") RETURNING id";
+  std::string query =
+      "INSERT INTO users (name, resy_token) VALUES (" + placeholders.get();
   params.append(name);
+  placeholders.next();
+  query += ", " + placeholders.get();
+  params.append(resy_token);
+  query += ") RETURNING id";
 
   auto r = tx.exec_params1(query, params);
 
@@ -83,6 +89,9 @@ void User::update() {
   pqxx::placeholders placeholders{};
   std::string query = "UPDATE users SET name = " + placeholders.get();
   params.append(name);
+  placeholders.next();
+  query += ", resy_token = " + placeholders.get();
+  params.append(resy_token);
   placeholders.next();
   query += " WHERE id = " + placeholders.get();
   params.append(id);

@@ -1,26 +1,31 @@
 #pragma once
 
+#include "src/reserver/models/reservation_service_code.h"
 #include <optional>
 #include <string>
 #include <vector>
 
 /**
- * represents a unique user
+ * represents a unique restaurant
  */
-class User {
+class Restaurant {
 public:
   // primary key
   int id;
 
   std::string name;
 
+  ReservationServiceCode rsc;
+
   static void create_table();
 
   static void drop_table();
 
-  static std::optional<User> get(int id);
+  static std::optional<Restaurant> get(int id);
 
-  static std::vector<User> get_all();
+  static std::vector<Restaurant> get_by_name(std::string &name);
+
+  static std::vector<Restaurant> get_all();
 
   void create();
 
