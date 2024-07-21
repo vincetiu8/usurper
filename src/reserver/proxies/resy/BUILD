@@ -7,7 +7,6 @@ cc_library(
     deps = [
       "//src/utils/http_clients",
       "//src/reserver/models",
-      "//src/reserver/proxies/resy/models",
       "//src/utils/config",
       "//src/utils/geo",
       "//src/utils/time",
