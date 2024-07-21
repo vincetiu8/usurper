@@ -17,6 +17,8 @@ public:
 
   ReservationServiceCode rsc;
 
+  std::optional<int> resy_id;
+
   static void create_table();
 
   static void drop_table();
@@ -24,6 +26,8 @@ public:
   static std::optional<Restaurant> get(int id);
 
   static std::vector<Restaurant> get_by_name(std::string &name);
+
+  static std::optional<Restaurant> get_by_resy_id(int resy_id);
 
   static std::vector<Restaurant> get_all();
 
