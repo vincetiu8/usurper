@@ -21,7 +21,7 @@ void ResyRestaurant::create_table() {
 void ResyRestaurant::drop_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "DROP TABLE IF EXISTS resy_restaurants";
+  std::string query = "DROP TABLE IF EXISTS resy_restaurants CASCADE";
   tx.exec(query);
 
   tx.commit();

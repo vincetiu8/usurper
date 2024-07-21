@@ -1,5 +1,6 @@
 #pragma once
 
+#include "src/reserver/reserver_models/reservation_service_code.h"
 #include <optional>
 #include <string>
 #include <vector>
@@ -13,6 +14,8 @@ public:
   int id;
 
   std::string name;
+
+  ReservationServiceCode rsc;
 
   static void create_table();
 

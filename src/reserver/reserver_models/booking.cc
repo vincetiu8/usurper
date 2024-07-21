@@ -23,7 +23,7 @@ void Booking::create_table() {
 void Booking::drop_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "DROP TABLE IF EXISTS bookings";
+  std::string query = "DROP TABLE IF EXISTS bookings CASCADE";
   tx.exec(query);
 
   tx.commit();

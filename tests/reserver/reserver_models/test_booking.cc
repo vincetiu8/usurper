@@ -45,9 +45,11 @@ TEST_CASE("booking interacts with db correctly",
   User user2 = User{.name = "user 2"};
   user2.save();
 
-  Restaurant restaurant1 = Restaurant{.name = "restaurant 1"};
+  Restaurant restaurant1 =
+      Restaurant{.name = "restaurant 1", .rsc = ReservationServiceCode::resy};
   restaurant1.save();
-  Restaurant restaurant2 = Restaurant{.name = "restaurant 2"};
+  Restaurant restaurant2 =
+      Restaurant{.name = "restaurant 2", .rsc = ReservationServiceCode::resy};
   restaurant2.save();
 
   Date date1(2000, 1, 1);
@@ -197,9 +199,4 @@ TEST_CASE("booking interacts with db correctly",
     std::vector<BookingAssertion> expected = {};
     assert_booking_list_in_db(expected);
   }
-
-  Booking::drop_table();
-  Timeslot::drop_table();
-  Restaurant::drop_table();
-  User::drop_table();
 }

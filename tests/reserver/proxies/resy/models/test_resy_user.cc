@@ -156,7 +156,4 @@ TEST_CASE("resy user interacts with db correctly",
 
     assert_resy_user_list_in_db({});
   }
-
-  ResyUser::drop_table();
-  User::drop_table();
 }
