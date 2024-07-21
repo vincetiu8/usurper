@@ -5,7 +5,8 @@ cc_library(
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
-        "//src/reserver/proxies/resy:resy",
+        "//src/reserver/proxies/resy",
+        "//src/reserver/models"
     ],
     visibility = ["//src:__pkg__", "//tests:__subpackages__"],
 )
