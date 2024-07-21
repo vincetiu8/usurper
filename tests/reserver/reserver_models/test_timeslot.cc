@@ -11,6 +11,7 @@ struct TimeslotAssertion {
   Time end_time;
   int party_size;
   bool available;
+  std::optional<std::string> resy_token;
 };
 
 void assert_timeslot(const Timeslot &timeslot,
@@ -22,6 +23,7 @@ void assert_timeslot(const Timeslot &timeslot,
   REQUIRE(timeslot.end_time == assertion.end_time);
   REQUIRE(timeslot.party_size == assertion.party_size);
   REQUIRE(timeslot.available == assertion.available);
+  REQUIRE(timeslot.resy_token == assertion.resy_token);
 }
 
 void assert_timeslot_list(const std::vector<Timeslot> &timeslots,
@@ -54,10 +56,12 @@ TEST_CASE("timeslot interacts with db correctly",
   Time end_time2(14, 30);
 
   Restaurant restaurant1{.name = "restaurant 1",
-                         .rsc = ReservationServiceCode::resy};
+                         .rsc = ReservationServiceCode::resy,
+                         .resy_id = 1};
   restaurant1.save();
   Restaurant restaurant2{.name = "restaurant 2",
-                         .rsc = ReservationServiceCode::resy};
+                         .rsc = ReservationServiceCode::resy,
+                         .resy_id = 2};
   restaurant2.save();
 
   SECTION("stores and loads timeslot from db") {
@@ -68,6 +72,7 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
     timeslot.save();
 
@@ -79,6 +84,7 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
 
     assert_timeslot_list_in_db({expected});
@@ -96,6 +102,7 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
     timeslot1.save();
     Timeslot timeslot2{
@@ -115,7 +122,8 @@ TEST_CASE("timeslot interacts with db correctly",
          .start_time = start_time1,
          .end_time = end_time1,
          .party_size = 2,
-         .available = true},
+         .available = true,
+         .resy_token = "token"},
         {.id = timeslot2.id,
          .restaurant_id = restaurant2.id,
          .date = date2,
@@ -136,10 +144,12 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
     timeslot.save();
 
     timeslot.party_size = 4;
+    timeslot.resy_token = std::nullopt;
     timeslot.save();
 
     TimeslotAssertion expected = {
@@ -163,6 +173,7 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
     timeslot.save();
 
@@ -170,6 +181,7 @@ TEST_CASE("timeslot interacts with db correctly",
     REQUIRE(other.has_value());
 
     other.value().party_size = 4;
+    other.value().resy_token = std::nullopt;
     other.value().save();
 
     TimeslotAssertion expected = {
@@ -193,6 +205,7 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
     timeslot.save();
 
@@ -208,6 +221,7 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
     timeslot.save();
 
@@ -223,6 +237,7 @@ TEST_CASE("timeslot interacts with db correctly",
         .end_time = end_time1,
         .party_size = 2,
         .available = true,
+        .resy_token = "token",
     };
     timeslot1.save();
     Timeslot timeslot2{

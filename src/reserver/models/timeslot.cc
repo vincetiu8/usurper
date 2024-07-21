@@ -16,6 +16,7 @@ void Timeslot::create_table() {
                       " end_time TIME NOT NULL,"
                       " party_size INT NOT NULL,"
                       " available BOOLEAN NOT NULL,"
+                      " resy_token TEXT,"
                       " FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)"
                       ")";
 
@@ -49,20 +50,20 @@ std::optional<Timeslot> Timeslot::get(int id) {
   pqxx::params params{};
   pqxx::placeholders placeholders{};
   std::string query = "SELECT restaurant_id, date, start_time, end_time, "
-                      "party_size, available FROM timeslots"
+                      "party_size, available, resy_token FROM timeslots"
                       " WHERE id = " +
                       placeholders.get();
   params.append(id);
 
-  auto r = tx.query01<int, std::string, std::string, std::string, int, bool>(
-      query, params);
+  auto r = tx.query01<int, std::string, std::string, std::string, int, bool,
+                      std::optional<std::string>>(query, params);
 
   if (!r.has_value()) {
     return std::nullopt;
   }
 
-  auto [restaurant_id, date, start_time, end_time, party_size, available] =
-      r.value();
+  auto [restaurant_id, date, start_time, end_time, party_size, available,
+        resy_token] = r.value();
 
   return Timeslot{.id = id,
                   .restaurant_id = restaurant_id,
@@ -70,7 +71,8 @@ std::optional<Timeslot> Timeslot::get(int id) {
                   .start_time = Time(start_time, "%H:%M:%S"),
                   .end_time = Time(end_time, "%H:%M:%S"),
                   .party_size = party_size,
-                  .available = available};
+                  .available = available,
+                  .resy_token = resy_token};
 }
 
 std::optional<Timeslot>
@@ -81,7 +83,7 @@ Timeslot::get_by_restaurant_id_date_start_time(int restaurant_id, Date date,
   pqxx::params params{};
   pqxx::placeholders placeholders{};
   std::string query =
-      "SELECT id, end_time, party_size, available FROM timeslots"
+      "SELECT id, end_time, party_size, available, resy_token FROM timeslots"
       " WHERE restaurant_id = " +
       placeholders.get();
   params.append(restaurant_id);
@@ -92,13 +94,14 @@ Timeslot::get_by_restaurant_id_date_start_time(int restaurant_id, Date date,
   query += " AND start_time = " + placeholders.get();
   params.append(start_time.to_hh_mm_ss_string());
 
-  auto r = tx.query01<int, std::string, int, bool>(query, params);
+  auto r = tx.query01<int, std::string, int, bool, std::optional<std::string>>(
+      query, params);
 
   if (!r.has_value()) {
     return std::nullopt;
   }
 
-  auto [id, end_time, party_size, available] = r.value();
+  auto [id, end_time, party_size, available, resy_token] = r.value();
 
   return Timeslot{.id = id,
                   .restaurant_id = restaurant_id,
@@ -106,7 +109,8 @@ Timeslot::get_by_restaurant_id_date_start_time(int restaurant_id, Date date,
                   .start_time = start_time,
                   .end_time = Time(end_time, "%H:%M:%S"),
                   .party_size = party_size,
-                  .available = available};
+                  .available = available,
+                  .resy_token = resy_token};
 }
 
 std::vector<Timeslot> Timeslot::get_by_restaurant_id(int restaurant_id) {
@@ -115,25 +119,27 @@ std::vector<Timeslot> Timeslot::get_by_restaurant_id(int restaurant_id) {
   pqxx::params params{};
   pqxx::placeholders placeholders{};
   std::string query = "SELECT id, date, start_time, end_time, party_size, "
-                      "available FROM timeslots"
+                      "available, resy_token FROM timeslots"
                       " WHERE restaurant_id = " +
                       placeholders.get();
   params.append(restaurant_id);
   query += " ORDER BY date, start_time";
 
-  auto r = tx.query<int, std::string, std::string, std::string, int, bool>(
-      query, params);
+  auto r = tx.query<int, std::string, std::string, std::string, int, bool,
+                    std::optional<std::string>>(query, params);
 
   std::vector<Timeslot> timeslots;
   for (auto &row : r) {
-    auto [id, date, start_time, end_time, party_size, available] = row;
+    auto [id, date, start_time, end_time, party_size, available, resy_token] =
+        row;
     timeslots.push_back(Timeslot{.id = id,
                                  .restaurant_id = restaurant_id,
                                  .date = Date(date, "%Y-%m-%d"),
                                  .start_time = Time(start_time, "%H:%M:%S"),
                                  .end_time = Time(end_time, "%H:%M:%S"),
                                  .party_size = party_size,
-                                 .available = available});
+                                 .available = available,
+                                 .resy_token = resy_token});
   }
 
   return timeslots;
@@ -143,22 +149,23 @@ std::vector<Timeslot> Timeslot::get_all() {
   pqxx::work tx = get_work();
 
   std::string query = "SELECT id, restaurant_id, date, start_time, end_time, "
-                      "party_size, available FROM timeslots"
+                      "party_size, available, resy_token FROM timeslots"
                       " ORDER BY restaurant_id, date, start_time";
-  auto r = tx.query<int, int, std::string, std::string, std::string, int, bool>(
-      query);
+  auto r = tx.query<int, int, std::string, std::string, std::string, int, bool,
+                    std::optional<std::string>>(query);
 
   std::vector<Timeslot> timeslots;
   for (auto &row : r) {
-    auto [id, restaurant_id, date, start_time, end_time, party_size,
-          available] = row;
+    auto [id, restaurant_id, date, start_time, end_time, party_size, available,
+          resy_token] = row;
     timeslots.push_back(Timeslot{.id = id,
                                  .restaurant_id = restaurant_id,
                                  .date = Date(date, "%Y-%m-%d"),
                                  .start_time = Time(start_time, "%H:%M:%S"),
                                  .end_time = Time(end_time, "%H:%M:%S"),
                                  .party_size = party_size,
-                                 .available = available});
+                                 .available = available,
+                                 .resy_token = resy_token});
   }
 
   return timeslots;
@@ -170,25 +177,29 @@ void Timeslot::create() {
   pqxx::params params{};
   pqxx::placeholders placeholders{};
   std::string query = "INSERT INTO timeslots (restaurant_id, date, start_time, "
-                      "end_time, party_size, available)"
+                      "end_time, party_size, available, resy_token)"
                       " VALUES (" +
-                      placeholders.get() + ", ";
+                      placeholders.get();
   params.append(restaurant_id);
   placeholders.next();
-  query += placeholders.get() + ", ";
+  query += ", " + placeholders.get();
   params.append(date.to_yyyy_mm_dd_string());
   placeholders.next();
-  query += placeholders.get() + ", ";
+  query += ", " + placeholders.get();
   params.append(start_time.to_hh_mm_ss_string());
   placeholders.next();
-  query += placeholders.get() + ", ";
+  query += ", " + placeholders.get();
   params.append(end_time.to_hh_mm_ss_string());
   placeholders.next();
-  query += placeholders.get() + ", ";
+  query += ", " + placeholders.get();
   params.append(party_size);
   placeholders.next();
-  query += placeholders.get() + ") RETURNING id";
+  query += ", " + placeholders.get();
   params.append(available);
+  placeholders.next();
+  query += ", " + placeholders.get();
+  params.append(resy_token);
+  query += ") RETURNING id";
 
   auto r = tx.exec_params1(query, params);
 
@@ -203,23 +214,26 @@ void Timeslot::update() {
   pqxx::params params{};
   pqxx::placeholders placeholders{};
   std::string query =
-      "UPDATE timeslots SET restaurant_id = " + placeholders.get() + ", ";
+      "UPDATE timeslots SET restaurant_id = " + placeholders.get();
   params.append(restaurant_id);
   placeholders.next();
-  query += "date = " + placeholders.get() + ", ";
+  query += ", date = " + placeholders.get();
   params.append(date.to_yyyy_mm_dd_string());
   placeholders.next();
-  query += "start_time = " + placeholders.get() + ", ";
+  query += ", start_time = " + placeholders.get();
   params.append(start_time.to_hh_mm_ss_string());
   placeholders.next();
-  query += "end_time = " + placeholders.get() + ", ";
+  query += ", end_time = " + placeholders.get();
   params.append(end_time.to_hh_mm_ss_string());
   placeholders.next();
-  query += "party_size = " + placeholders.get() + ", ";
+  query += ", party_size = " + placeholders.get();
   params.append(party_size);
   placeholders.next();
-  query += "available = " + placeholders.get();
+  query += ", available = " + placeholders.get();
   params.append(available);
+  placeholders.next();
+  query += ", resy_token = " + placeholders.get();
+  params.append(resy_token);
   placeholders.next();
   query += " WHERE id = " + placeholders.get();
   params.append(id);
