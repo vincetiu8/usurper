@@ -15,16 +15,15 @@ class ResyProxy : public ReservationProxy {
 public:
   ResyProxy();
 
-  void login(User user, std::string_view email,
+  void login(User &user, std::string_view email,
              std::string_view password) override;
 
-  std::vector<Restaurant> query_restaurants(std::string_view name) override;
+  std::vector<Restaurant> get_restaurants(std::string_view name) override;
 
-  std::vector<Timeslot> get_restaurant_timeslots(Restaurant restaurant,
-                                                 int party_size,
-                                                 Date date) override;
+  std::vector<Timeslot> get_timeslots(Restaurant &restaurant, int party_size,
+                                      Date &date) override;
 
-  void book_timeslot(User user, Timeslot timeslot) override;
+  Booking book_timeslot(User &user, Timeslot &timeslot) override;
 
-  void cancel_booking(User user, Booking booking) override;
+  void cancel_booking(User &user, Booking &booking) override;
 };

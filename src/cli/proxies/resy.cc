@@ -32,30 +32,24 @@ int resy_handler(cli_args &args) {
 
   if (resy_command == "search") {
     if (args.size() < 5) {
-      std::cout << "no auth token specified" << '\n';
-      return 1;
-    }
-
-    if (args.size() < 6) {
       std::cout << "no latitude specified" << '\n';
       return 1;
     }
 
-    if (args.size() < 7) {
+    if (args.size() < 6) {
       std::cout << "no longitude specified" << '\n';
       return 1;
     }
 
-    if (args.size() < 8) {
+    if (args.size() < 7) {
       std::cout << "no query specified" << '\n';
       return 1;
     }
 
     ResyApi::SearchInput input{
-        .auth_token = args[4],
-        .geo = {.latitude = std::stod(std::string(args[5])),
-                .longitude = std::stod(std::string(args[6]))},
-        .query = args[7],
+        .geo = {.latitude = std::stod(std::string(args[4])),
+                .longitude = std::stod(std::string(args[5]))},
+        .query = args[6],
     };
 
     ResyApi::SearchOutput output = api.search(input);
@@ -67,30 +61,24 @@ int resy_handler(cli_args &args) {
 
   if (resy_command == "find") {
     if (args.size() < 5) {
-      std::cout << "no auth token specified" << '\n';
-      return 1;
-    }
-
-    if (args.size() < 6) {
       std::cout << "no venue id specified" << '\n';
       return 1;
     }
 
-    if (args.size() < 7) {
+    if (args.size() < 6) {
       std::cout << "no party size specified" << '\n';
       return 1;
     }
 
-    if (args.size() < 8) {
+    if (args.size() < 7) {
       std::cout << "no date specified" << '\n';
       return 1;
     }
 
     ResyApi::FindInput input{
-        .auth_token = args[4],
-        .venue_id = std::stoi(std::string(args[5])),
-        .party_size = std::stoi(std::string(args[6])),
-        .day = Date(std::string(args[7]), "%y-%m-%d"),
+        .venue_id = std::stoi(std::string(args[4])),
+        .party_size = std::stoi(std::string(args[5])),
+        .date = Date(std::string(args[6]), "%y-%m-%d"),
     };
 
     ResyApi::FindOutput output = api.find(input);
