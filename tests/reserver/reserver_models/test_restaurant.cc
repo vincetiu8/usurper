@@ -1,3 +1,4 @@
+#include "src/reserver/reserver_models/reservation_service_code.h"
 #include "src/reserver/reserver_models/restaurant.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
@@ -5,12 +6,14 @@
 struct RestaurantAssertion {
   int id;
   std::string name;
+  ReservationServiceCode rsc;
 };
 
 void assert_restaurant(const Restaurant &restaurant,
                        const RestaurantAssertion &assertion) {
   REQUIRE(restaurant.id == assertion.id);
   REQUIRE(restaurant.name == assertion.name);
+  REQUIRE(restaurant.rsc == assertion.rsc);
 }
 
 void assert_restaurant_list(
@@ -34,12 +37,14 @@ TEST_CASE("restaurant interacts with db correctly",
   Restaurant::create_table();
 
   SECTION("stores and loads restaurant from db") {
-    Restaurant restaurant{.name = "restaurant 1"};
+    Restaurant restaurant{.name = "restaurant 1",
+                          .rsc = ReservationServiceCode::resy};
     restaurant.save();
 
     RestaurantAssertion expected = {
         .id = restaurant.id,
         .name = "restaurant 1",
+        .rsc = ReservationServiceCode::resy,
     };
 
     std::optional<Restaurant> other = Restaurant::get(restaurant.id);
@@ -48,32 +53,42 @@ TEST_CASE("restaurant interacts with db correctly",
   }
 
   SECTION("stores and loads multiple restaurants from db") {
-    Restaurant restaurant1{.name = "restaurant 1"};
+    Restaurant restaurant1{.name = "restaurant 1",
+                           .rsc = ReservationServiceCode::resy};
     restaurant1.save();
-    Restaurant restaurant2{.name = "restaurant 2"};
+    Restaurant restaurant2{.name = "restaurant 2",
+                           .rsc = ReservationServiceCode::resy};
     restaurant2.save();
 
     std::vector<RestaurantAssertion> expected = {
-        {.id = restaurant1.id, .name = "restaurant 1"},
-        {.id = restaurant2.id, .name = "restaurant 2"},
+        {.id = restaurant1.id,
+         .name = "restaurant 1",
+         .rsc = ReservationServiceCode::resy},
+        {.id = restaurant2.id,
+         .name = "restaurant 2",
+         .rsc = ReservationServiceCode::resy},
     };
 
     assert_restaurant_list_in_db(expected);
   }
 
   SECTION("gets restaurants by name from db") {
-    Restaurant restaurant1{.name = "restaurant 1"};
+    Restaurant restaurant1{.name = "restaurant 1",
+                           .rsc = ReservationServiceCode::resy};
     restaurant1.save();
-    Restaurant restaurant2{.name = "restaurant 2"};
+    Restaurant restaurant2{.name = "restaurant 2",
+                           .rsc = ReservationServiceCode::resy};
     restaurant2.save();
 
     RestaurantAssertion expected1 = {
         .id = restaurant1.id,
         .name = "restaurant 1",
+        .rsc = ReservationServiceCode::resy,
     };
     RestaurantAssertion expected2 = {
         .id = restaurant2.id,
         .name = "restaurant 2",
+        .rsc = ReservationServiceCode::resy,
     };
 
     std::string name = "restaurant 1";
@@ -98,7 +113,8 @@ TEST_CASE("restaurant interacts with db correctly",
   }
 
   SECTION("updates restaurant with same reference in db") {
-    Restaurant restaurant{.name = "restaurant 1"};
+    Restaurant restaurant{.name = "restaurant 1",
+                          .rsc = ReservationServiceCode::resy};
     restaurant.save();
 
     restaurant.name = "restaurant 2";
@@ -107,13 +123,15 @@ TEST_CASE("restaurant interacts with db correctly",
     RestaurantAssertion expected = {
         .id = restaurant.id,
         .name = "restaurant 2",
+        .rsc = ReservationServiceCode::resy,
     };
 
     assert_restaurant_list_in_db({expected});
   }
 
   SECTION("updates restaurant with different reference in db") {
-    Restaurant restaurant{.name = "restaurant 1"};
+    Restaurant restaurant{.name = "restaurant 1",
+                          .rsc = ReservationServiceCode::resy};
     restaurant.save();
 
     std::optional<Restaurant> other = Restaurant::get(restaurant.id);
@@ -125,6 +143,7 @@ TEST_CASE("restaurant interacts with db correctly",
     RestaurantAssertion expected = {
         .id = restaurant.id,
         .name = "restaurant 2",
+        .rsc = ReservationServiceCode::resy,
     };
 
     assert_restaurant_list_in_db({expected});
@@ -135,7 +154,8 @@ TEST_CASE("restaurant interacts with db correctly",
   }
 
   SECTION("removes restaurant from db") {
-    Restaurant restaurant{.name = "restaurant 1"};
+    Restaurant restaurant{.name = "restaurant 1",
+                          .rsc = ReservationServiceCode::resy};
     restaurant.save();
 
     restaurant.remove();
@@ -144,7 +164,8 @@ TEST_CASE("restaurant interacts with db correctly",
   }
 
   SECTION("removes restaurant by id from db") {
-    Restaurant restaurant{.name = "restaurant 1"};
+    Restaurant restaurant{.name = "restaurant 1",
+                          .rsc = ReservationServiceCode::resy};
     restaurant.save();
 
     Restaurant::remove(restaurant.id);
@@ -153,15 +174,15 @@ TEST_CASE("restaurant interacts with db correctly",
   }
 
   SECTION("removes all restaurants from db") {
-    Restaurant restaurant1{.name = "restaurant 1"};
+    Restaurant restaurant1{.name = "restaurant 1",
+                           .rsc = ReservationServiceCode::resy};
     restaurant1.save();
-    Restaurant restaurant2{.name = "restaurant 2"};
+    Restaurant restaurant2{.name = "restaurant 2",
+                           .rsc = ReservationServiceCode::resy};
     restaurant2.save();
 
     Restaurant::remove_all();
 
     assert_restaurant_list_in_db({});
   }
-
-  Restaurant::drop_table();
 }

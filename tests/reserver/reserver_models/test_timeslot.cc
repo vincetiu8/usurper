@@ -53,9 +53,11 @@ TEST_CASE("timeslot interacts with db correctly",
   Time start_time2(13, 0);
   Time end_time2(14, 30);
 
-  Restaurant restaurant1{.name = "restaurant 1"};
+  Restaurant restaurant1{.name = "restaurant 1",
+                         .rsc = ReservationServiceCode::resy};
   restaurant1.save();
-  Restaurant restaurant2{.name = "restaurant 2"};
+  Restaurant restaurant2{.name = "restaurant 2",
+                         .rsc = ReservationServiceCode::resy};
   restaurant2.save();
 
   SECTION("stores and loads timeslot from db") {
@@ -236,7 +238,4 @@ TEST_CASE("timeslot interacts with db correctly",
     Timeslot::remove_all();
     assert_timeslot_list_in_db({});
   }
-
-  Timeslot::drop_table();
-  Restaurant::drop_table();
 }

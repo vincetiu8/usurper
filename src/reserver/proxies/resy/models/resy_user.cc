@@ -21,7 +21,7 @@ void ResyUser::create_table() {
 void ResyUser::drop_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "DROP TABLE IF EXISTS resy_users";
+  std::string query = "DROP TABLE IF EXISTS resy_users CASCADE";
   tx.exec(query);
 
   tx.commit();

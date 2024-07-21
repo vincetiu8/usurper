@@ -122,6 +122,4 @@ TEST_CASE("user interacts with db correctly",
     User::remove_all();
     assert_user_list_in_db({});
   }
-
-  User::drop_table();
 }

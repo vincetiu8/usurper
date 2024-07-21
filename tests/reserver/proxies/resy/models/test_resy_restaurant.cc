@@ -36,9 +36,11 @@ TEST_CASE("resy restaurant interacts with db correctly",
   Restaurant::create_table();
   ResyRestaurant::create_table();
 
-  Restaurant restaurant1{.name = "restaurant 1"};
+  Restaurant restaurant1{.name = "restaurant 1",
+                         .rsc = ReservationServiceCode::resy};
   restaurant1.save();
-  Restaurant restaurant2{.name = "restaurant 2"};
+  Restaurant restaurant2{.name = "restaurant 2",
+                         .rsc = ReservationServiceCode::resy};
   restaurant2.save();
 
   SECTION("stores and loads resy restaurant from db") {
@@ -158,7 +160,4 @@ TEST_CASE("resy restaurant interacts with db correctly",
 
     assert_resy_restaurant_list_in_db({});
   }
-
-  ResyRestaurant::drop_table();
-  Restaurant::drop_table();
 }

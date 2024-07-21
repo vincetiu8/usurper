@@ -20,7 +20,7 @@ void User::create_table() {
 void User::drop_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "DROP TABLE IF EXISTS users";
+  std::string query = "DROP TABLE IF EXISTS users CASCADE";
   tx.exec(query);
 
   tx.commit();

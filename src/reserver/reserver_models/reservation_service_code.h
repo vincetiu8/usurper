@@ -6,6 +6,7 @@
  * unique code for each reservation service in system
  */
 enum ReservationServiceCode {
+  none,
   resy,
 };
 

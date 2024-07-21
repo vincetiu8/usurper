@@ -9,7 +9,8 @@ void Restaurant::create_table() {
 
   std::string query = "CREATE TABLE IF NOT EXISTS restaurants ("
                       " id SERIAL PRIMARY KEY,"
-                      " name TEXT NOT NULL"
+                      " name TEXT NOT NULL,"
+                      " reservation_service_code TEXT"
                       ")";
 
   tx.exec(query);
@@ -20,7 +21,7 @@ void Restaurant::create_table() {
 void Restaurant::drop_table() {
   pqxx::work tx = get_work();
 
-  std::string query = "DROP TABLE IF EXISTS restaurants";
+  std::string query = "DROP TABLE IF EXISTS restaurants CASCADE";
   tx.exec(query);
 
   tx.commit();
@@ -31,22 +32,23 @@ std::optional<Restaurant> Restaurant::get(int id) {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query = "SELECT name FROM restaurants"
+  std::string query = "SELECT name, reservation_service_code FROM restaurants"
                       " WHERE id = " +
                       placeholders.get();
   params.append(id);
 
-  auto r = tx.query01<std::string>(query, params);
+  auto r = tx.query01<std::string, std::string>(query, params);
 
   if (!r.has_value()) {
     return std::nullopt;
   }
 
-  auto [name] = r.value();
+  auto [name, rsc] = r.value();
 
   Restaurant restaurant;
   restaurant.id = id;
   restaurant.name = name;
+  restaurant.rsc = string_to_reservation_service_code(rsc);
 
   return restaurant;
 }
@@ -58,20 +60,22 @@ std::vector<Restaurant> Restaurant::get_by_name(std::string &name) {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query = "SELECT id, name FROM restaurants"
-                      " WHERE name LIKE " +
-                      placeholders.get();
+  std::string query =
+      "SELECT id, name, reservation_service_code FROM restaurants"
+      " WHERE name LIKE " +
+      placeholders.get();
   params.append('%' + name + '%');
   query += " ORDER BY id";
 
-  auto r = tx.query<int, std::string>(query, params);
+  auto r = tx.query<int, std::string, std::string>(query, params);
 
   std::vector<Restaurant> restaurants;
   for (const auto &row : r) {
-    auto [id, name] = row;
+    auto [id, name, rsc] = row;
     Restaurant restaurant;
     restaurant.id = id;
     restaurant.name = name;
+    restaurant.rsc = string_to_reservation_service_code(rsc);
     restaurants.push_back(restaurant);
   }
 
@@ -81,15 +85,17 @@ std::vector<Restaurant> Restaurant::get_by_name(std::string &name) {
 std::vector<Restaurant> Restaurant::get_all() {
   pqxx::work tx = get_work();
 
-  std::string query = "SELECT id, name FROM restaurants ORDER BY id";
-  auto r = tx.query<int, std::string>(query);
+  std::string query =
+      "SELECT id, name, reservation_service_code FROM restaurants ORDER BY id";
+  auto r = tx.query<int, std::string, std::string>(query);
 
   std::vector<Restaurant> restaurants;
   for (const auto &row : r) {
-    auto [id, name] = row;
+    auto [id, name, rsc] = row;
     Restaurant restaurant;
     restaurant.id = id;
     restaurant.name = name;
+    restaurant.rsc = string_to_reservation_service_code(rsc);
     restaurants.push_back(restaurant);
   }
 
@@ -103,9 +109,13 @@ void Restaurant::create() {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query = "INSERT INTO restaurants (name) VALUES (" +
-                      placeholders.get() + ") RETURNING id";
+  std::string query =
+      "INSERT INTO restaurants (name, reservation_service_code) VALUES (" +
+      placeholders.get() + ", ";
   params.append(name);
+  placeholders.next();
+  query += placeholders.get() + +") RETURNING id";
+  params.append(reservation_service_code_to_string(rsc));
 
   auto r = tx.exec_params1(query, params);
 
@@ -121,11 +131,14 @@ void Restaurant::update() {
 
   pqxx::params params{};
   pqxx::placeholders placeholders{};
-  std::string query = "UPDATE restaurants SET name = " + placeholders.get();
+  std::string query =
+      "UPDATE restaurants SET name = " + placeholders.get() + ", ";
   params.append(name);
   placeholders.next();
+  query += " reservation_service_code = " + placeholders.get();
+  params.append(reservation_service_code_to_string(rsc));
+  placeholders.next();
   query += " WHERE id = " + placeholders.get();
-
   params.append(id);
 
   tx.exec_params(query, params);

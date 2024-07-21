@@ -36,7 +36,7 @@ void Timeslot::drop_table() {
 
   tx.exec(query);
 
-  query = "DROP TABLE IF EXISTS timeslots";
+  query = "DROP TABLE IF EXISTS timeslots CASCADE";
   tx.exec(query);
 
   tx.commit();
