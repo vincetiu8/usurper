@@ -28,6 +28,8 @@ public:
 
   void save();
 
+  void refresh();
+
   void remove();
 
   static void remove(int user_id, int timeslot_id);

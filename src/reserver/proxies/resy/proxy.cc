@@ -104,4 +104,21 @@ void ResyProxy::book_timeslot(User user, Timeslot timeslot) {
   };
 
   ResyApi::BookOutput book_output = api.book(book_input);
+
+  Booking booking{
+      .user_id = user.id,
+      .timeslot_id = timeslot.id,
+      .resy_token = book_output.booking_token,
+  };
+
+  booking.save();
+}
+
+void ResyProxy::cancel_booking(User user, Booking booking) {
+  ResyApi::CancelInput cancel_input{
+      .auth_token = user.resy_token.value(),
+      .booking_token = booking.resy_token.value(),
+  };
+
+  api.cancel(cancel_input);
 }

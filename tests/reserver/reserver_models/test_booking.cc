@@ -149,6 +149,54 @@ TEST_CASE("booking interacts with db correctly",
     assert_booking_list(bookings, {expected});
   }
 
+  SECTION("updates booking with same reference in db") {
+    Booking booking{
+        .user_id = user1.id,
+        .timeslot_id = timeslot1.id,
+        .resy_token = "token",
+    };
+
+    booking.create();
+
+    booking.resy_token = std::nullopt;
+    booking.save();
+
+    BookingAssertion expected = {
+        .user_id = user1.id,
+        .timeslot_id = timeslot1.id,
+    };
+
+    assert_booking_list_in_db({expected});
+  }
+
+  SECTION("updates booking with different reference in db") {
+    Booking booking{
+        .user_id = user1.id,
+        .timeslot_id = timeslot1.id,
+        .resy_token = "token",
+    };
+
+    booking.create();
+
+    std::optional<Booking> other =
+        Booking::get(booking.user_id, booking.timeslot_id);
+    REQUIRE(other.has_value());
+
+    other.value().resy_token = std::nullopt;
+    other.value().save();
+
+    BookingAssertion expected = {
+        .user_id = user1.id,
+        .timeslot_id = timeslot1.id,
+    };
+
+    assert_booking_list_in_db({expected});
+
+    booking.refresh();
+
+    assert_booking(booking, expected);
+  }
+
   SECTION("deletes booking from db") {
     Booking booking{
         .user_id = user1.id,
