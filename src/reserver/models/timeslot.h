@@ -24,6 +24,8 @@ public:
 
   bool available;
 
+  std::optional<std::string> resy_token;
+
   static void create_table();
 
   static void drop_table();

@@ -21,7 +21,7 @@ public:
   std::vector<Timeslot> get_restaurant_timeslots(Restaurant restaurant,
                                                  int party_size, Date date);
 
-  int book_timeslot(Timeslot timeslot);
+  void book_timeslot(User user, Timeslot timeslot);
 
   int cancel_booking(Booking booking);
 };
