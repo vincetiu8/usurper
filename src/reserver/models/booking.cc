@@ -136,6 +136,26 @@ void Booking::update() {
   tx.commit();
 }
 
+void Booking::save() {
+  std::optional<Booking> booking = get(user_id, timeslot_id);
+
+  if (booking.has_value()) {
+    update();
+  } else {
+    create();
+  }
+}
+
+void Booking::refresh() {
+  std::optional<Booking> booking = get(user_id, timeslot_id);
+
+  if (booking.has_value()) {
+    *this = booking.value();
+  } else {
+    throw std::runtime_error("Booking does not exist");
+  }
+}
+
 void Booking::remove() { remove(user_id, timeslot_id); }
 
 void Booking::remove(int user_id, int timeslot_id) {

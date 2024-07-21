@@ -23,5 +23,5 @@ public:
 
   void book_timeslot(User user, Timeslot timeslot);
 
-  int cancel_booking(Booking booking);
+  void cancel_booking(User user, Booking booking);
 };
