@@ -1,5 +1,6 @@
 #pragma once
 
+#include "src/reserver/models/reservation_service_code.h"
 #include <string>
 #include <vector>
 
@@ -10,6 +11,8 @@ class ResyUser {
 public:
   int user_id;
 
+  ReservationServiceCode reservation_service_code;
+
   // JWT token
   std::string auth_token;
 
@@ -17,7 +20,8 @@ public:
 
   static void drop_table();
 
-  static std::optional<ResyUser> get(int user_id);
+  static std::optional<ResyUser>
+  get(ReservationServiceCode reservation_service_code, int user_id);
 
   static std::vector<ResyUser> get_all();
 
@@ -31,7 +35,10 @@ public:
 
   void remove();
 
-  static void remove(int user_id);
+  static void remove(ReservationServiceCode reservation_service_code,
+                     int user_id);
+
+  static void remove_by_user_id(int user_id);
 
   static void remove_all();
 };

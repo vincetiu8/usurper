@@ -1,7 +1,7 @@
-#include "src/reserver/reserver_models/booking.h"
-#include "src/reserver/reserver_models/restaurant.h"
-#include "src/reserver/reserver_models/timeslot.h"
-#include "src/reserver/reserver_models/user.h"
+#include "src/reserver/models/booking.h"
+#include "src/reserver/models/restaurant.h"
+#include "src/reserver/models/timeslot.h"
+#include "src/reserver/models/user.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
@@ -30,7 +30,7 @@ void assert_booking_list_in_db(
 }
 
 TEST_CASE("booking interacts with db correctly",
-          "[reserver][reserver_models][booking]") {
+          "[reserver][models][booking]") {
   Booking::drop_table();
   Timeslot::drop_table();
   Restaurant::drop_table();

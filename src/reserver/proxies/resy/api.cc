@@ -60,7 +60,7 @@ ResyApi::SearchOutput ResyApi::search(SearchInput input) {
 ResyApi::FindOutput ResyApi::find(FindInput input) {
   std::string target = "/4/find?lat=0&long=0";
   target += "&day=";
-  target += input.day.to_yyyy_mm_dd_string();
+  target += input.date.to_yyyy_mm_dd_string();
   target += "&party_size=";
   target += std::to_string(input.party_size);
   target += "&venue_id=";

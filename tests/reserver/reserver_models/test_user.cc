@@ -1,15 +1,17 @@
-#include "src/reserver/reserver_models/user.h"
+#include "src/reserver/models/user.h"
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 
 struct UserAssertion {
   int id;
   std::string name;
+  std::optional<std::string> resy_token;
 };
 
 void assert_user(const User &user, const UserAssertion &assertion) {
   REQUIRE(user.id == assertion.id);
   REQUIRE(user.name == assertion.name);
+  REQUIRE(user.resy_token == assertion.resy_token);
 }
 
 void assert_user_list(const std::vector<User> &users,
@@ -25,18 +27,18 @@ void assert_user_list_in_db(const std::vector<UserAssertion> &assertions) {
   assert_user_list(users, assertions);
 }
 
-TEST_CASE("user interacts with db correctly",
-          "[reserver][reserver_models][user]") {
+TEST_CASE("user interacts with db correctly", "[reserver][models][user]") {
   User::drop_table();
   User::create_table();
 
   SECTION("stores and loads user from db") {
-    User user{.name = "user 1"};
+    User user{.name = "user 1", .resy_token = "token"};
     user.save();
 
     UserAssertion expected = {
         .id = user.id,
         .name = "user 1",
+        .resy_token = "token",
     };
 
     assert_user_list_in_db({expected});
@@ -47,13 +49,13 @@ TEST_CASE("user interacts with db correctly",
   }
 
   SECTION("stores and loads multiple users from db") {
-    User user1{.name = "user 1"};
+    User user1{.name = "user 1", .resy_token = "token"};
     user1.save();
     User user2{.name = "user 2"};
     user2.save();
 
     std::vector<UserAssertion> expected = {
-        {.id = user1.id, .name = "user 1"},
+        {.id = user1.id, .name = "user 1", .resy_token = "token"},
         {.id = user2.id, .name = "user 2"},
     };
 
@@ -61,10 +63,11 @@ TEST_CASE("user interacts with db correctly",
   }
 
   SECTION("updates user with same reference in db") {
-    User user{.name = "user 1"};
+    User user{.name = "user 1", .resy_token = "token"};
     user.save();
 
     user.name = "user 2";
+    user.resy_token = std::nullopt;
     user.save();
 
     UserAssertion expected = {
@@ -76,13 +79,14 @@ TEST_CASE("user interacts with db correctly",
   }
 
   SECTION("updates user with different reference in db") {
-    User user{.name = "user 1"};
+    User user{.name = "user 1", .resy_token = "token"};
     user.save();
 
     std::optional<User> other = User::get(user.id);
     REQUIRE(other.has_value());
 
     other.value().name = "user 2";
+    other.value().resy_token = std::nullopt;
     other.value().save();
 
     UserAssertion expected = {
@@ -98,7 +102,7 @@ TEST_CASE("user interacts with db correctly",
   }
 
   SECTION("removes user from db") {
-    User user{.name = "user 1"};
+    User user{.name = "user 1", .resy_token = "token"};
     user.save();
 
     user.remove();
@@ -106,7 +110,7 @@ TEST_CASE("user interacts with db correctly",
   }
 
   SECTION("removes user by id from db") {
-    User user{.name = "user 1"};
+    User user{.name = "user 1", .resy_token = "token"};
     user.save();
 
     User::remove(user.id);
@@ -114,7 +118,7 @@ TEST_CASE("user interacts with db correctly",
   }
 
   SECTION("removes all users from db") {
-    User user1{.name = "user 1"};
+    User user1{.name = "user 1", .resy_token = "token"};
     user1.save();
     User user2{.name = "user 2"};
     user2.save();

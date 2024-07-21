@@ -58,7 +58,7 @@ public:
   public:
     int venue_id;
     int party_size;
-    Date day;
+    Date date;
   };
 
   class FindOutputSlot {
@@ -73,7 +73,6 @@ public:
 
   class FindOutput {
   public:
-    int id;
     std::vector<FindOutputSlot> slots;
   };
 

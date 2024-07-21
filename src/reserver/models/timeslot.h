@@ -30,6 +30,10 @@ public:
 
   static std::optional<Timeslot> get(int id);
 
+  static std::optional<Timeslot>
+  get_by_restaurant_id_date_start_time(int restaurant_id, Date date,
+                                       Time start_time);
+
   static std::vector<Timeslot> get_by_restaurant_id(int restaurant_id);
 
   static std::vector<Timeslot> get_all();

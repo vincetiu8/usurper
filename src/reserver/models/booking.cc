@@ -1,4 +1,4 @@
-#include "src/reserver/reserver_models/booking.h"
+#include "src/reserver/models/booking.h"
 #include "src/utils/db/db.h"
 #include <optional>
 #include <pqxx/pqxx>

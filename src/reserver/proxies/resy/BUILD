@@ -6,7 +6,7 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
       "//src/utils/http_clients",
-      "//src/reserver/reserver_models",
+      "//src/reserver/models",
       "//src/reserver/proxies/resy/models",
       "//src/utils/config",
       "//src/utils/geo",

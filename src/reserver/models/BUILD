@@ -5,12 +5,11 @@ cc_library(
     srcs = glob(["*.cc"]),
     hdrs = glob(["*.h"]),
     deps = [
-      "//src/reserver/reserver_models",
-      "//src/utils/config",
-      "//src/utils/db",
       "//src/utils/geo",
       "//src/utils/time",
+      "//src/utils/db",
       "@libpqxx//:libpqxx",
+      "//src/utils/string",
     ],
-    visibility = ["//src/reserver/proxies/resy:__pkg__", "//tests:__subpackages__"],
+    visibility = ["//src/reserver:__subpackages__", "//tests:__subpackages__"],
 )
