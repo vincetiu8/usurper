@@ -72,11 +72,11 @@ std::string HttpClient::run_request(http::request<http::string_body> &req,
   req.set(http::field::host, host_bs);
 
   for (auto &[field, value] : headers) {
-    std::cout << "setting " << field << " to " << value << '\n';
+    // std::cout << "setting " << field << " to " << value << '\n';
     req.set(field, value);
   }
   for (auto &[field, value] : _headers) {
-    std::cout << "setting " << field << " to " << value << '\n';
+    // std::cout << "setting " << field << " to " << value << '\n';
     req.set(field, value);
   }
 

@@ -5,6 +5,7 @@ cc_binary(
   srcs = glob(["*.cc"]),
   deps = [
     "//src/cli/proxies",
+    "//src/cli/services",
     "//src/utils/cli",
     "//src/cli/db",
   ],

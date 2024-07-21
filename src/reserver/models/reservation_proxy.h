@@ -9,15 +9,15 @@
 
 class ReservationProxy {
 public:
-  virtual void login(User user, std::string_view email,
-                     std::string_view password);
+  virtual void login(User &user, std::string_view email,
+                     std::string_view password) = 0;
 
-  virtual std::vector<Restaurant> query_restaurants(std::string_view name);
+  virtual std::vector<Restaurant> get_restaurants(std::string_view name) = 0;
 
-  virtual std::vector<Timeslot>
-  get_restaurant_timeslots(Restaurant restaurant, int party_size, Date date);
+  virtual std::vector<Timeslot> get_timeslots(Restaurant &restaurant,
+                                              int party_size, Date &date) = 0;
 
-  virtual void book_timeslot(User user, Timeslot timeslot);
+  virtual Booking book_timeslot(User &user, Timeslot &timeslot) = 0;
 
-  virtual void cancel_booking(User user, Booking booking);
+  virtual void cancel_booking(User &user, Booking &booking) = 0;
 };

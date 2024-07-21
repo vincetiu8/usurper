@@ -1,6 +1,7 @@
 #include "src/utils/cli/cli.h"
 #include "src/cli/db/db.h"
 #include "src/cli/proxies/proxy.h"
+#include "src/cli/services/reserver.h"
 #include "src/utils/cli/cli_args.h"
 #include <iostream>
 #include <string_view>
@@ -19,6 +20,10 @@ int command_handler(cli_args &args) {
 
   if (command == "db") {
     return db_handler(args);
+  }
+
+  if (command == "reserver") {
+    return reserver_handler(args);
   }
 
   std::cout << "unknown command " << command << '\n';

@@ -6,7 +6,7 @@
 
 ResyProxy::ResyProxy() : api{ResyApi()} {};
 
-void ResyProxy::login(User user, std::string_view email,
+void ResyProxy::login(User &user, std::string_view email,
                       std::string_view password) {
   ResyApi::LoginInput login_input{.email = email, .password = password};
 
@@ -16,7 +16,7 @@ void ResyProxy::login(User user, std::string_view email,
   user.save();
 }
 
-std::vector<Restaurant> ResyProxy::query_restaurants(std::string_view name) {
+std::vector<Restaurant> ResyProxy::get_restaurants(std::string_view name) {
   ResyApi::SearchInput search_input{
       .geo = new_york,
       .query = name,
@@ -24,7 +24,7 @@ std::vector<Restaurant> ResyProxy::query_restaurants(std::string_view name) {
 
   ResyApi::SearchOutput search_output = api.search(search_input);
 
-  std::vector<Restaurant> restaurants;
+  std::vector<Restaurant> restaurants{};
 
   for (const ResyApi::SearchOutputHit &hit : search_output.hits) {
     std::optional<Restaurant> result = Restaurant::get_by_resy_id(hit.id);
@@ -48,9 +48,8 @@ std::vector<Restaurant> ResyProxy::query_restaurants(std::string_view name) {
   return restaurants;
 }
 
-std::vector<Timeslot> ResyProxy::get_restaurant_timeslots(Restaurant restaurant,
-                                                          int party_size,
-                                                          Date date) {
+std::vector<Timeslot> ResyProxy::get_timeslots(Restaurant &restaurant,
+                                               int party_size, Date &date) {
   ResyApi::FindInput find_input{
       .venue_id = restaurant.resy_id.value(),
       .party_size = 2,
@@ -59,7 +58,7 @@ std::vector<Timeslot> ResyProxy::get_restaurant_timeslots(Restaurant restaurant,
 
   ResyApi::FindOutput find_output = api.find(find_input);
 
-  std::vector<Timeslot> timeslots;
+  std::vector<Timeslot> timeslots{};
 
   for (const ResyApi::FindOutputSlot &slot : find_output.slots) {
     std::optional<Timeslot> result =
@@ -88,7 +87,7 @@ std::vector<Timeslot> ResyProxy::get_restaurant_timeslots(Restaurant restaurant,
   return timeslots;
 }
 
-void ResyProxy::book_timeslot(User user, Timeslot timeslot) {
+Booking ResyProxy::book_timeslot(User &user, Timeslot &timeslot) {
   ResyApi::DetailsInput details_input{
       .auth_token = user.resy_token.value(),
       .timeslot_token = timeslot.resy_token.value(),
@@ -112,9 +111,11 @@ void ResyProxy::book_timeslot(User user, Timeslot timeslot) {
   };
 
   booking.save();
+
+  return booking;
 }
 
-void ResyProxy::cancel_booking(User user, Booking booking) {
+void ResyProxy::cancel_booking(User &user, Booking &booking) {
   ResyApi::CancelInput cancel_input{
       .auth_token = user.resy_token.value(),
       .booking_token = booking.resy_token.value(),
