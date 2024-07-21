@@ -8,11 +8,13 @@
 struct BookingAssertion {
   int user_id;
   int timeslot_id;
+  std::optional<std::string> resy_token;
 };
 
 void assert_booking(const Booking &booking, const BookingAssertion &assertion) {
   REQUIRE(booking.user_id == assertion.user_id);
   REQUIRE(booking.timeslot_id == assertion.timeslot_id);
+  REQUIRE(booking.resy_token == assertion.resy_token);
 }
 
 void assert_booking_list(const std::vector<Booking> &bookings,
@@ -40,16 +42,18 @@ TEST_CASE("booking interacts with db correctly",
   Timeslot::create_table();
   Booking::create_table();
 
-  User user1 = User{.name = "user 1"};
+  User user1 = User{.name = "user 1", .resy_token = "token 1"};
   user1.save();
-  User user2 = User{.name = "user 2"};
+  User user2 = User{.name = "user 2", .resy_token = "token 2"};
   user2.save();
 
-  Restaurant restaurant1 =
-      Restaurant{.name = "restaurant 1", .rsc = ReservationServiceCode::resy};
+  Restaurant restaurant1 = Restaurant{.name = "restaurant 1",
+                                      .rsc = ReservationServiceCode::resy,
+                                      .resy_id = 1};
   restaurant1.save();
-  Restaurant restaurant2 =
-      Restaurant{.name = "restaurant 2", .rsc = ReservationServiceCode::resy};
+  Restaurant restaurant2 = Restaurant{.name = "restaurant 2",
+                                      .rsc = ReservationServiceCode::resy,
+                                      .resy_id = 2};
   restaurant2.save();
 
   Date date1(2000, 1, 1);
@@ -83,12 +87,14 @@ TEST_CASE("booking interacts with db correctly",
     Booking booking{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
     booking.create();
 
     BookingAssertion expected = {
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
 
     std::optional<Booking> other =
@@ -101,6 +107,7 @@ TEST_CASE("booking interacts with db correctly",
     Booking booking1{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
     booking1.create();
     Booking booking2{
@@ -110,7 +117,9 @@ TEST_CASE("booking interacts with db correctly",
     booking2.create();
 
     std::vector<BookingAssertion> expected = {
-        {.user_id = user1.id, .timeslot_id = timeslot1.id},
+        {.user_id = user1.id,
+         .timeslot_id = timeslot1.id,
+         .resy_token = "token"},
         {.user_id = user2.id, .timeslot_id = timeslot2.id},
     };
 
@@ -121,6 +130,7 @@ TEST_CASE("booking interacts with db correctly",
     Booking booking1{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
     booking1.create();
     Booking booking2{
@@ -132,6 +142,7 @@ TEST_CASE("booking interacts with db correctly",
     BookingAssertion expected = {
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
 
     std::vector<Booking> bookings = Booking::get_by_user_id(user1.id);
@@ -142,6 +153,7 @@ TEST_CASE("booking interacts with db correctly",
     Booking booking{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
     booking.create();
 
@@ -155,6 +167,7 @@ TEST_CASE("booking interacts with db correctly",
     Booking booking{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
     booking.create();
 
@@ -168,6 +181,7 @@ TEST_CASE("booking interacts with db correctly",
     Booking booking1{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
     booking1.create();
     Booking booking2{
@@ -186,6 +200,7 @@ TEST_CASE("booking interacts with db correctly",
     Booking booking1{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
+        .resy_token = "token",
     };
     booking1.create();
     Booking booking2{

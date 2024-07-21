@@ -1,4 +1,5 @@
 #include <optional>
+#include <string>
 
 /**
  * represents a user timeslot booking
@@ -8,6 +9,8 @@ public:
   int user_id;
 
   int timeslot_id;
+
+  std::optional<std::string> resy_token;
 
   static void create_table();
 
@@ -20,6 +23,10 @@ public:
   static std::vector<Booking> get_all();
 
   void create();
+
+  void update();
+
+  void save();
 
   void remove();
 
