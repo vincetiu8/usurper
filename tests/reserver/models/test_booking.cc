@@ -197,7 +197,7 @@ TEST_CASE("booking interacts with db correctly",
     assert_booking(booking, expected);
   }
 
-  SECTION("deletes booking from db") {
+  SECTION("removes booking from db") {
     Booking booking{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
@@ -211,7 +211,7 @@ TEST_CASE("booking interacts with db correctly",
     assert_booking_list_in_db(expected);
   }
 
-  SECTION("deletes booking by user id and timeslot id from db") {
+  SECTION("removes booking by user id and timeslot id from db") {
     Booking booking{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,
@@ -244,7 +244,7 @@ TEST_CASE("booking interacts with db correctly",
     assert_booking_list_in_db(expected);
   }
 
-  SECTION("deletes all bookings from db") {
+  SECTION("removes all bookings from db") {
     Booking booking1{
         .user_id = user1.id,
         .timeslot_id = timeslot1.id,

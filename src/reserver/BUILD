@@ -8,5 +8,9 @@ cc_library(
         "//src/reserver/proxies/resy",
         "//src/reserver/models"
     ],
-    visibility = ["//src/cli/services:__pkg__", "//tests:__subpackages__"],
+    visibility = [
+      "//src/cli/services:__pkg__", 
+      "//src/concierge:__pkg__",
+      "//tests:__subpackages__"
+    ],
 )

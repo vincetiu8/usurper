@@ -11,5 +11,10 @@ cc_library(
       "@libpqxx//:libpqxx",
       "//src/utils/string",
     ],
-    visibility = ["//src/reserver:__subpackages__", "//src/cli/services:__pkg__", "//tests:__subpackages__"],
+    visibility = [
+      "//src/reserver:__subpackages__",
+      "//src/cli/services:__pkg__",
+      "//src/concierge:__subpackages__",
+      "//tests:__subpackages__",
+    ],
 )
