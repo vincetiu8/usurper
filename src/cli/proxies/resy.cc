@@ -75,10 +75,16 @@ int resy_handler(cli_args &args) {
       return 1;
     }
 
+    std::optional<Time> time_filter =
+        args.size() < 8
+            ? std::nullopt
+            : std::optional<Time>(Time(std::string(args[7]), "%H:%M"));
+
     ResyApi::FindInput input{
         .venue_id = std::stoi(std::string(args[4])),
         .party_size = std::stoi(std::string(args[5])),
         .date = Date(std::string(args[6]), "%y-%m-%d"),
+        .time_filter = time_filter,
     };
 
     ResyApi::FindOutput output = api.find(input);
@@ -119,9 +125,14 @@ int resy_handler(cli_args &args) {
         .party_size = std::stoi(std::string(args[7])),
     };
 
-    ResyApi::DetailsOutput output = api.details(input);
+    std::optional<ResyApi::DetailsOutput> output = api.details(input);
 
-    std::cout << "book token: " << output.book_token << '\n';
+    if (!output.has_value()) {
+      std::cout << "details failed" << '\n';
+      return 1;
+    }
+
+    std::cout << "book token: " << output->book_token << '\n';
     return 0;
   }
 
@@ -141,10 +152,15 @@ int resy_handler(cli_args &args) {
         .book_token = args[5],
     };
 
-    ResyApi::BookOutput output = api.book(input);
+    std::optional<ResyApi::BookOutput> output = api.book(input);
 
-    std::cout << "booking token: " << output.booking_token
-              << "\treservation id: " << output.reservation_id << '\n';
+    if (!output.has_value()) {
+      std::cout << "booking failed" << '\n';
+      return 1;
+    }
+
+    std::cout << "booking token: " << output->booking_token
+              << "\treservation id: " << output->reservation_id << '\n';
     return 0;
   }
 

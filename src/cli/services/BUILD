@@ -6,6 +6,7 @@ cc_library(
   hdrs = glob(["*.h"]),
   deps = [
     "//src/reserver",
+    "//src/concierge",
     "//src/utils/cli",
     "//src/utils/http_clients",
     "//src/utils/config",

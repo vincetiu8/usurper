@@ -59,6 +59,7 @@ public:
     int venue_id;
     int party_size;
     Date date;
+    std::optional<Time> time_filter;
   };
 
   class FindOutputSlot {
@@ -74,6 +75,7 @@ public:
   class FindOutput {
   public:
     std::vector<FindOutputSlot> slots;
+    std::string template_ids;
   };
 
   /**
@@ -97,7 +99,7 @@ public:
   /**
    * endpoint to get details on a reservation
    */
-  DetailsOutput details(DetailsInput input);
+  std::optional<DetailsOutput> details(DetailsInput input);
 
   class BookInput {
   public:
@@ -114,7 +116,7 @@ public:
   /**
    * endpoint to book a reservation
    */
-  BookOutput book(BookInput);
+  std::optional<BookOutput> book(BookInput);
 
   class CancelInput {
   public:

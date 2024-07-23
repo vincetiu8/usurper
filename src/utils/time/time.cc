@@ -8,6 +8,7 @@ Date::Date(int year, int month, int date)
 Date::Date(const std::string &date_str, const std::string &format) {
   tm tm = {};
   strptime(date_str.c_str(), format.c_str(), &tm);
+
   year = tm.tm_year + 1900;
   month = tm.tm_mon + 1;
   date = tm.tm_mday;
@@ -89,3 +90,45 @@ bool Time::operator==(const Time &rhs) const {
 }
 
 bool Time::operator!=(const Time &rhs) const { return !(*this == rhs); }
+
+Time Time::operator+(const Time &rhs) const {
+  int h = hour + rhs.hour;
+  int m = minute + rhs.minute;
+  if (m >= 60) {
+    h++;
+    m -= 60;
+  }
+  return Time{h, m};
+}
+
+Time Time::operator+=(const Time &rhs) {
+  *this = *this + rhs;
+  return *this;
+}
+
+Time Time::operator-(const Time &rhs) const {
+  int h = hour - rhs.hour;
+  int m = minute - rhs.minute;
+  if (m < 0) {
+    h--;
+    m += 60;
+  }
+  return Time{h, m};
+}
+
+Time Time::operator-=(const Time &rhs) {
+  *this = *this - rhs;
+  return *this;
+}
+
+bool Time::operator<(const Time &rhs) const {
+  return hour < rhs.hour || (hour == rhs.hour && minute < rhs.minute);
+}
+
+bool Time::operator>(const Time &rhs) const {
+  return hour > rhs.hour || (hour == rhs.hour && minute > rhs.minute);
+}
+
+bool Time::operator<=(const Time &rhs) const { return !(*this > rhs); }
+
+bool Time::operator>=(const Time &rhs) const { return !(*this < rhs); }

@@ -8,6 +8,7 @@ cc_binary(
     "//src/cli/services",
     "//src/utils/cli",
     "//src/cli/db",
+    "//src/utils/init",
   ],
   visibility = ["//visibility:public"]
 )

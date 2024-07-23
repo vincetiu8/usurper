@@ -8,6 +8,7 @@ cc_library(
     "//src/reserver/models",
     "//src/reserver",
     "//src/concierge/models",
+    "//src/utils/string",
   ],
-  visibility = ["//src:__pkg__"],
+  visibility = ["//src/cli/services:__pkg__", "//src/utils/init:__pkg__"],
 )

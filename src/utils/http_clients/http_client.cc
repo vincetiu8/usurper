@@ -66,8 +66,8 @@ HttpClient::~HttpClient() {
 
 std::string HttpClient::run_request(http::request<http::string_body> &req,
                                     headers_t _headers) {
-  // std::cout << stream.lowest_layer().remote_endpoint().address().to_string()
-  // << ' ' << req.target() << '\n';
+  std::cout << stream.lowest_layer().remote_endpoint().address().to_string()
+            << ' ' << req.target() << '\n';
 
   req.set(http::field::host, host_bs);
 
@@ -87,13 +87,18 @@ std::string HttpClient::run_request(http::request<http::string_body> &req,
 
   http::read(stream, buffer, res);
 
+  if (res.result() == http::status::internal_server_error) {
+    std::cerr << "internal server error\n";
+    return "";
+  }
+
   std::string s{};
   for (auto seq : res.body().data()) {
     auto *cbuf = boost::asio::buffer_cast<const char *>(seq);
     s.append(cbuf, boost::asio::buffer_size(seq));
   }
 
-  // std::cout << s << '\n';
+  std::cout << s << '\n';
 
   return s;
 }
