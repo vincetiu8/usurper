@@ -14,6 +14,7 @@ cc_library(
     visibility = [
       "//src/reserver:__subpackages__",
       "//src/cli/services:__pkg__",
+      "//src/utils/init:__pkg__",
       "//src/concierge:__subpackages__",
       "//tests:__subpackages__",
     ],

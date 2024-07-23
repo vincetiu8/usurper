@@ -1,6 +1,10 @@
-#include "src/reserver/models/restaurant.h"
+#pragma once
+
 #include "src/utils/time/time.h"
 
+/**
+ * represents a request to book a restaurant
+ */
 class BookingRequest {
 public:
   int id;
@@ -10,7 +14,6 @@ public:
   Time earliest_time;
   Time latest_time;
   int party_size;
-  std::optional<int> timeslot_id_fulfilled_with;
 
   static void create_table();
 

@@ -20,11 +20,12 @@ std::vector<Restaurant> Reserver::get_restaurants(std::string_view name) {
 }
 
 std::vector<Timeslot> Reserver::get_timeslots(Restaurant &restaurant,
-                                              int party_size, Date &date) {
-  return resy_proxy.get_timeslots(restaurant, party_size, date);
+                                              int party_size, Date &date,
+                                              std::optional<Time> time_filter) {
+  return resy_proxy.get_timeslots(restaurant, party_size, date, time_filter);
 }
 
-Booking Reserver::book_timeslot(User &user, Timeslot &timeslot) {
+std::optional<Booking> Reserver::book_timeslot(User &user, Timeslot &timeslot) {
   return resy_proxy.book_timeslot(user, timeslot);
 }
 

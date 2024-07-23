@@ -21,9 +21,10 @@ public:
   std::vector<Restaurant> get_restaurants(std::string_view name) override;
 
   std::vector<Timeslot> get_timeslots(Restaurant &restaurant, int party_size,
-                                      Date &date) override;
+                                      Date &date,
+                                      std::optional<Time> time_filter) override;
 
-  Booking book_timeslot(User &user, Timeslot &timeslot) override;
+  std::optional<Booking> book_timeslot(User &user, Timeslot &timeslot) override;
 
   void cancel_booking(User &user, Booking &booking) override;
 };

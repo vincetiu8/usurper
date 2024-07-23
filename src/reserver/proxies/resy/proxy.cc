@@ -2,6 +2,7 @@
 #include "src/reserver/models/restaurant.h"
 #include "src/reserver/models/timeslot.h"
 #include "src/reserver/proxies/resy/api.h"
+#include <optional>
 #include <string_view>
 
 ResyProxy::ResyProxy() : api{ResyApi()} {};
@@ -48,12 +49,17 @@ std::vector<Restaurant> ResyProxy::get_restaurants(std::string_view name) {
   return restaurants;
 }
 
-std::vector<Timeslot> ResyProxy::get_timeslots(Restaurant &restaurant,
-                                               int party_size, Date &date) {
+std::vector<Timeslot>
+ResyProxy::get_timeslots(Restaurant &restaurant, int party_size, Date &date,
+                         std::optional<Time> time_filter) {
   ResyApi::FindInput find_input{
       .venue_id = restaurant.resy_id.value(),
       .party_size = 2,
       .date = date,
+      .time_filter =
+          time_filter.has_value()
+              ? std::optional<Time>(time_filter.value() + Time(1, 30))
+              : std::nullopt,
   };
 
   ResyApi::FindOutput find_output = api.find(find_input);
@@ -84,10 +90,14 @@ std::vector<Timeslot> ResyProxy::get_timeslots(Restaurant &restaurant,
     timeslots.push_back(timeslot);
   }
 
+  restaurant.resy_template_ids = find_output.template_ids;
+  restaurant.save();
+
   return timeslots;
 }
 
-Booking ResyProxy::book_timeslot(User &user, Timeslot &timeslot) {
+std::optional<Booking> ResyProxy::book_timeslot(User &user,
+                                                Timeslot &timeslot) {
   ResyApi::DetailsInput details_input{
       .auth_token = user.resy_token.value(),
       .timeslot_token = timeslot.resy_token.value(),
@@ -95,19 +105,28 @@ Booking ResyProxy::book_timeslot(User &user, Timeslot &timeslot) {
       .party_size = timeslot.party_size,
   };
 
-  ResyApi::DetailsOutput details_output = api.details(details_input);
+  std::optional<ResyApi::DetailsOutput> details_output =
+      api.details(details_input);
+
+  if (!details_output.has_value()) {
+    return std::nullopt;
+  }
 
   ResyApi::BookInput book_input{
       .auth_token = user.resy_token.value(),
-      .book_token = details_output.book_token,
+      .book_token = details_output->book_token,
   };
 
-  ResyApi::BookOutput book_output = api.book(book_input);
+  std::optional<ResyApi::BookOutput> book_output = api.book(book_input);
+
+  if (!book_output.has_value()) {
+    return std::nullopt;
+  }
 
   Booking booking{
       .user_id = user.id,
       .timeslot_id = timeslot.id,
-      .resy_token = book_output.booking_token,
+      .resy_token = book_output->booking_token,
   };
 
   booking.save();
@@ -120,6 +139,8 @@ void ResyProxy::cancel_booking(User &user, Booking &booking) {
       .auth_token = user.resy_token.value(),
       .booking_token = booking.resy_token.value(),
   };
+
+  booking.remove();
 
   api.cancel(cancel_input);
 }

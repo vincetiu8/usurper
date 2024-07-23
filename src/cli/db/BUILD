@@ -7,6 +7,7 @@ cc_library(
   deps = [
     "//src/utils/cli",
     "//src/utils/db",
+    "//src/utils/init",
     "@libpqxx//:libpqxx",
   ],
   visibility = ["//src/cli:__pkg__"],

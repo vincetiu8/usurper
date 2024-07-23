@@ -64,12 +64,22 @@ ResyApi::FindOutput ResyApi::find(FindInput input) {
   target += std::to_string(input.party_size);
   target += "&venue_id=";
   target += std::to_string(input.venue_id);
+  if (input.time_filter.has_value()) {
+    target += "&time_filter=";
+    target += input.time_filter.value().to_hh_mm_string();
+  }
 
   json::value data = http_client.get(target, {});
 
+  if (!data.is_object()) {
+    // no slots available
+    return {};
+  }
+
   const json::object &data_obj = data.as_object();
-  const json::array &slots_arr =
-      data_obj.at("results").at("venues").at(0).at("slots").as_array();
+  const json::object &venue_obj =
+      data_obj.at("results").at("venues").at(0).as_object();
+  const json::array &slots_arr = venue_obj.at("slots").as_array();
 
   FindOutput output{};
   output.slots.reserve(slots_arr.size());
@@ -89,10 +99,19 @@ ResyApi::FindOutput ResyApi::find(FindInput input) {
     output.slots.push_back(slot_obj);
   }
 
+  const json::object templates = venue_obj.at("templates").as_object();
+
+  for (auto &[template_id, _] : templates) {
+    output.template_ids += template_id;
+    output.template_ids += ",";
+  }
+
+  output.template_ids.pop_back();
+
   return output;
 };
 
-ResyApi::DetailsOutput ResyApi::details(DetailsInput input) {
+std::optional<ResyApi::DetailsOutput> ResyApi::details(DetailsInput input) {
   const std::string target = "/3/details";
 
   json::value content{
@@ -109,6 +128,11 @@ ResyApi::DetailsOutput ResyApi::details(DetailsInput input) {
 
   json::value data = http_client.post_json(target, content, headers);
 
+  if (!data.is_object()) {
+    // details not available
+    return {};
+  }
+
   const json::object &data_obj = data.as_object();
   const json::string &book_token =
       data_obj.at("book_token").at("value").as_string();
@@ -120,7 +144,7 @@ ResyApi::DetailsOutput ResyApi::details(DetailsInput input) {
   return output;
 };
 
-ResyApi::BookOutput ResyApi::book(BookInput input) {
+std::optional<ResyApi::BookOutput> ResyApi::book(BookInput input) {
   std::string target = "/3/book";
   std::string content = "book_token=";
   content += input.book_token;
@@ -133,7 +157,18 @@ ResyApi::BookOutput ResyApi::book(BookInput input) {
 
   json::value data = http_client.post_form_data(target, content, headers);
 
+  if (!data.is_object()) {
+    // booking not available or too early or already booked
+    return {};
+  }
+
   json::object &data_obj = data.as_object();
+  if (!data_obj.contains("reservation_id")) {
+    // booking not available or too early or already booked
+
+    return {};
+  }
+
   const json::string &resy_token = data_obj.at("resy_token").as_string();
 
   target = "/3/user/reservations";
@@ -142,6 +177,7 @@ ResyApi::BookOutput ResyApi::book(BookInput input) {
   target += "&book_on_behalf_of=false";
 
   data = http_client.get(target, headers);
+
   data_obj = data.as_object();
 
   const json::object reservation_obj =

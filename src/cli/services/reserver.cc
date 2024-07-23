@@ -102,8 +102,13 @@ int reserver_handler(cli_args &args) {
     int party_size = std::stoi(std::string(args[4]));
     Date date(std::string(args[5]), "%y-%m-%d");
 
-    std::vector<Timeslot> timeslots =
-        reserver.get_timeslots(restaurant.value(), party_size, date);
+    std::optional<Time> time_filter;
+    if (args.size() >= 7) {
+      time_filter = Time(std::string(args[6]), "%H:%M");
+    }
+
+    std::vector<Timeslot> timeslots = reserver.get_timeslots(
+        restaurant.value(), party_size, date, time_filter);
 
     std::cout << "id\tstart_time\tend_time\n";
     for (Timeslot timeslot : timeslots) {
@@ -122,6 +127,7 @@ int reserver_handler(cli_args &args) {
 
     if (args.size() < 5) {
       std::cout << "no timeslot specified\n";
+      return 1;
     }
 
     int user_id{std::stoi(std::string(args[3]))};
@@ -142,6 +148,29 @@ int reserver_handler(cli_args &args) {
     reserver.book_timeslot(user.value(), timeslot.value());
 
     std::cout << "booked\n";
+    return 0;
+  }
+
+  if (reserver_command == "bookings") {
+    if (args.size() < 4) {
+      std::cout << "no user specified\n";
+      return 1;
+    }
+
+    int user_id = std::stoi(std::string(args[3]));
+    std::vector<Booking> bookings = Booking::get_by_user_id(user_id);
+
+    std::cout << "timeslot_id\t\trestaurant\t\tdate\t\ttime\n";
+    for (Booking booking : bookings) {
+      std::optional<Timeslot> timeslot = Timeslot::get(booking.timeslot_id);
+      std::optional<Restaurant> restaurant =
+          Restaurant::get(timeslot->restaurant_id);
+
+      std::cout << timeslot->id << "\t\t" << restaurant->name << "\t\t"
+                << timeslot->date.to_yy_mm_dd_string() << "\t\t"
+                << timeslot->start_time.to_hh_mm_string() << '\n';
+    }
+
     return 0;
   }
 

@@ -19,6 +19,8 @@ public:
 
   std::optional<int> resy_id;
 
+  std::optional<std::string> resy_template_ids;
+
   static void create_table();
 
   static void drop_table();

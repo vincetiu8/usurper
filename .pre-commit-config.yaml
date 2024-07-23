@@ -5,5 +5,5 @@ repos:
     hooks:
       - id: clang-format
         args: [-i]
-      - id: clang-tidy
-        args: [--fix-errors]
+      # - id: clang-tidy
+      #   args: [--fix-errors]

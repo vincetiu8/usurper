@@ -1,9 +1,6 @@
 #pragma once
 
-#include <chrono>
 #include <string>
-
-namespace chrono = std::chrono;
 
 class Date {
 public:
@@ -47,4 +44,20 @@ public:
   bool operator==(const Time &rhs) const;
 
   bool operator!=(const Time &rhs) const;
+
+  Time operator+(const Time &rhs) const;
+
+  Time operator+=(const Time &rhs);
+
+  Time operator-(const Time &rhs) const;
+
+  Time operator-=(const Time &rhs);
+
+  bool operator<(const Time &rhs) const;
+
+  bool operator>(const Time &rhs) const;
+
+  bool operator<=(const Time &rhs) const;
+
+  bool operator>=(const Time &rhs) const;
 };

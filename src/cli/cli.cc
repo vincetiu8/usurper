@@ -1,12 +1,17 @@
 #include "src/utils/cli/cli.h"
 #include "src/cli/db/db.h"
 #include "src/cli/proxies/proxy.h"
+#include "src/cli/services/concierge.h"
 #include "src/cli/services/reserver.h"
 #include "src/utils/cli/cli_args.h"
+#include "src/utils/init/models.h"
+#include "src/utils/init/timer.h"
 #include <iostream>
 #include <string_view>
 
 int command_handler(cli_args &args) {
+  init_models();
+
   if (args.size() < 2) {
     std::cout << "no command specified" << '\n';
     return 1;
@@ -24,6 +29,15 @@ int command_handler(cli_args &args) {
 
   if (command == "reserver") {
     return reserver_handler(args);
+  }
+
+  if (command == "concierge") {
+    return concierge_handler(args);
+  }
+
+  if (command == "cron") {
+    cron();
+    return 0;
   }
 
   std::cout << "unknown command " << command << '\n';
